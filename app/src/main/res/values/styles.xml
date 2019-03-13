@@ -1,11 +1,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
 
         <item name="android:textViewStyle">@style/LightTextViewStyle</item>
         <item name="android:buttonStyle">@style/LightBtnFontStyle</item>
@@ -17,11 +21,5 @@
     </style>
     <style name="LightBtnFontStyle" parent="android:Widget.Button">
         <item name="android:fontFamily">sans-serif-light</item>
-    </style>
-
-
-    <style name = "NoActionBar" parent = "Theme.AppCompat.Light.NoActionBar">
-        <item name = "android:windowActionBar">false</item>
-        <item name = "android:windowNoTitle">true</item>
     </style>
 </resources>

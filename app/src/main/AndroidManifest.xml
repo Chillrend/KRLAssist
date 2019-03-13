@@ -13,8 +13,7 @@
                 >
 
         </activity>
-        <activity android:name=".walkthrough"
-                android:theme="@style/NoActionBar">
+        <activity android:name=".walkthrough">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

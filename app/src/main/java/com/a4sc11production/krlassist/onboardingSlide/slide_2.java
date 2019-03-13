@@ -2,7 +2,7 @@ package com.a4sc11production.krlassist.onboardingSlide;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.TransitionDrawable;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -13,23 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 import com.a4sc11production.krlassist.R;
 import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
-import com.github.paolorotolo.appintro.ISlidePolicy;
-import es.dmoral.toasty.Toasty;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link slide_1.OnFragmentInteractionListener} interface
+ * {@link slide_2.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link slide_1#newInstance} factory method to
+ * Use the {@link slide_2#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, ISlidePolicy {
+public class slide_2 extends Fragment implements ISlideBackgroundColorHolder {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -38,14 +35,12 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
     private OnFragmentInteractionListener mListener;
 
-    TextView tifaw;
+    ImageView animated_checkmark;
 
-    LinearLayout red_line;
-    LinearLayout loop_line;
-
-    public slide_1() {
+    public slide_2() {
         // Required empty public constructor
     }
 
@@ -55,11 +50,11 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment slide_1.
+     * @return A new instance of fragment slide_2.
      */
     // TODO: Rename and change types and number of parameters
-    public static slide_1 newInstance(String param1, String param2) {
-        slide_1 fragment = new slide_1();
+    public static slide_2 newInstance(String param1, String param2) {
+        slide_2 fragment = new slide_2();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -79,12 +74,8 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-        
-        
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_slide_1, container, false);
+        return inflater.inflate(R.layout.fragment_slide_2, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -111,64 +102,25 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
         mListener = null;
     }
 
-    @Override
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        loop_line = (LinearLayout) getView().findViewById(R.id.loop_line);
-        red_line = (LinearLayout) getView().findViewById(R.id.red_line);
-
-        loop_line.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loop_line.setSelected(true);
-                red_line.setSelected(false);
-            }
-        });
-
-        red_line.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                red_line.setSelected(true);
-                loop_line.setSelected(false);
-
-
-            }
-        });
     }
 
-    @Override
     public int getDefaultBackgroundColor() {
         // Return the default background color of the slide.
-        return Color.parseColor("#00BCD4");
+        return Color.parseColor("#000000");
     }
 
     @Override
     public void setBackgroundColor(@ColorInt int backgroundColor) {
         // Set the background color of the view within your slide to which the transition should be applied.
-        FrameLayout fr = (FrameLayout) getView().findViewById(R.id.slide_1_container);
+        FrameLayout fr = (FrameLayout) getView().findViewById(R.id.slide_2_container);
 
         if (fr != null){
-            fr.setBackgroundColor(Color.parseColor("#5C6BCE"));
+            fr.setBackgroundColor(Color.parseColor("#4CAF50"));
 
         }
     }
-
-    @Override
-    public boolean isPolicyRespected() {
-        if (loop_line.isSelected() || red_line.isSelected()){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    @Override
-    public void onUserIllegallyRequestedNextPage() {
-        Toasty.error(getContext(), "Please choose one of the line", Toast.LENGTH_SHORT, true).show();
-        // User illegally requested next slide
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

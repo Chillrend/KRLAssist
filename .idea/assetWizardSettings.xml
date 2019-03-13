@@ -3,6 +3,11 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
+        <entry key="imageWizard">
+          <value>
+            <PersistentState />
+          </value>
+        </entry>
         <entry key="vectorWizard">
           <value>
             <PersistentState>
@@ -13,10 +18,13 @@
                       <PersistentState>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="7fb546" />
-                            <entry key="outputName" value="ic_android_24dp" />
+                            <entry key="height" value="250" />
+                            <entry key="outputName" value="ic_decree" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\X453SA" />
+                            <entry key="sourceFile" value="C:\Users\X453SA\Downloads\decree.svg" />
+                            <entry key="width" value="250" />
                           </map>
                         </option>
                       </PersistentState>
