@@ -9,17 +9,20 @@
 
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
 
-
-        <item name="android:textViewStyle">@style/LightTextViewStyle</item>
-        <item name="android:buttonStyle">@style/LightBtnFontStyle</item>
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
+        <item name="buttonStyle">@style/BtnFontStyle</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <!-- fonts -->
-    <style name="LightTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">sans-serif-light</item>
+    <style name="TextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif</item>
     </style>
-    <style name="LightBtnFontStyle" parent="android:Widget.Button">
-        <item name="android:fontFamily">sans-serif-light</item>
+    <style name="BtnFontStyle" parent="android:Widget.Button">
+        <item name="android:fontFamily">sans-serif</item>
     </style>
+
 </resources>
