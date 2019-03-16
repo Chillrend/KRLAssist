@@ -21,11 +21,11 @@
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="autoMirrored" value="true" />
                             <entry key="color" value="7fb546" />
-                            <entry key="height" value="512" />
-                            <entry key="outputName" value="ic_bekasi_line" />
+                            <entry key="height" value="50" />
+                            <entry key="outputName" value="ic_nfc_card" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="D:\Farhan\SVG Icons\bekasi_line.svg" />
-                            <entry key="width" value="512" />
+                            <entry key="sourceFile" value="D:\Farhan\SVG Icons\nfc-card.svg" />
+                            <entry key="width" value="50" />
                           </map>
                         </option>
                       </PersistentState>

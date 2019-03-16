@@ -14,11 +14,12 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0px"
-            android:layout_weight="0.45"
-            android:paddingTop="80dp"
+            android:layout_weight=".45"
+            android:paddingTop="?attr/actionBarSize"
             android:paddingLeft="25dp"
+            android:paddingBottom="25dp"
             android:paddingRight="25dp"
-            android:background="@color/color_warning"
+            android:background="@color/colorWarning"
             >
 
         <TextView
@@ -161,5 +162,69 @@
                     android:drawableRight="@drawable/ic_chevron_right_8_dp"/>
         </LinearLayout>
     </RelativeLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".183"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:padding="30dp"
+            android:background="#FD8A5E">
+        <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_realtime"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:text="Posisi Kereta"
+                android:textSize="28sp"
+                android:fontFamily="sans-serif-light"/>
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".183"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:padding="30dp"
+            android:background="#01DDDD">
+        <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_timetable"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:text="Jadwal Kereta"
+                android:textSize="28sp"
+                android:fontFamily="sans-serif-light"/>
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".183"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:padding="30dp"
+            android:background="#00BFAF">
+        <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_nfc_card"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:text="Cek Saldo KMT"
+                android:textSize="28sp"
+                android:fontFamily="sans-serif-light"/>
+    </LinearLayout>
+
     <!--Line Status End-->
 </LinearLayout>

@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorAccent">#FF5252</color>
+
     <color name="colorSlide0">#00BCD4</color>
     <color name="colorSlide1">#5C6BC0</color>
     <color name="colorSlide2">#4CAF50</color>
-    <color name="color_warning">#ffc107</color>
-    <color name="color_danger">#ff1744</color>
-    <color name="color_normal">#00bfa5</color>
+
+    <color name="colorWarning">#ffab00</color>
+    <color name="colorWarningDark">#c67c00</color>
+
+    <color name="colorDanger">#ff5252</color>
+    <color name="colorDangerDark">#c50e29</color>
+
+
+    <color name="colorNormal">#00c853</color>
+    <color name="colorNormalDark">#009624</color>
 
 </resources>
