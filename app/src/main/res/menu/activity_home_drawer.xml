@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:showIn="navigation_view">
+    <item
+            android:id="@+id/home"
+            android:icon="@drawable/ic_home"
+            android:title="Beranda"/>
+    <item
+            android:id="@+id/pos_krl"
+            android:icon="@drawable/ic_map_marked"
+            android:title="Posisi KRL"/>
+    <item
+            android:id="@+id/timetable"
+            android:icon="@drawable/ic_stopwatch"
+            android:title="Jadwal &amp; Rute"/>
+    <item
+            android:id="@+id/tariff"
+            android:icon="@drawable/ic_ticket_alt"
+            android:title="Tarif"/>
+    <item
+            android:id="@+id/check_card"
+            android:icon="@drawable/ic_credit_card"
+            android:title="Cek KMT"/>
+    <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_cogs"
+            android:title="Pengaturan"/>
+
+</menu>

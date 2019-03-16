@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nav_header_height"
+        android:background="#37474F"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="35dp"
+        android:theme="@style/NavDrawerHeaderStyle"
+        android:orientation="vertical"
+        android:gravity="top">
+
+    <TextView
+            android:id="@+id/weather_city_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cibinong"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="sans-serif-light"
+            android:textSize="24sp"
+            android:textAppearance="@style/AppIntroDefaultHeading"/>
+    <ImageView
+            android:id="@+id/drawable_weather"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/weather_city_name"
+            android:src="@drawable/ic_wind"/>
+    <TextView
+            android:id="@+id/weather_province"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_city_name"
+            android:text="Jawa Barat"/>
+    <TextView
+            android:id="@+id/weather_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_province"
+            android:text="Indonesia"/>
+    <LinearLayout
+            android:id="@+id/weather_value_container"
+            android:layout_below="@id/weather_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView
+                android:id="@+id/weather_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-light"
+                android:text="32"
+                android:drawableRight="@drawable/ic_degree_celcius"
+                android:drawablePadding="5dp"/>
+        <TextView
+                android:layout_marginLeft="15dp"
+                android:id="@+id/weather_raining_chance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-light"
+                android:text="40%"
+                android:drawableLeft="@drawable/ic_rain_chance"
+                android:drawablePadding="5dp"/>
+        <TextView
+                android:layout_marginLeft="15dp"
+                android:id="@+id/weather_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-light"
+                android:text="20%"
+                android:drawableLeft="@drawable/ic_humid"
+                android:drawablePadding="5dp"/>
+    </LinearLayout>
+    <TextView
+            android:layout_below="@id/weather_value_container"
+            android:layout_marginTop="8dp"
+            android:id="@+id/kata_mutiara"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sedia Payung Sebelum Hujan"/>
+
+
+
+</RelativeLayout>
