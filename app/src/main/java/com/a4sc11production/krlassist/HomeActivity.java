@@ -1,13 +1,17 @@
 package com.a4sc11production.krlassist;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.*;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,9 +20,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.a4sc11production.krlassist.fragments.home;
+import com.a4sc11production.krlassist.fragments.nfc_kmt;
+
+import java.math.BigInteger;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
+        nfc_kmt.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +47,33 @@ public class HomeActivity extends AppCompatActivity
 
         Fragment defaultFragment = new home();
 
-        displaySpecificFragment(defaultFragment);
+        displaySpecificFragment(defaultFragment, "HOME_FRAGMENT");
 
-        Window window = getWindow();
+        changeStatusBarAndToolbar(R.color.colorWarning,R.color.colorWarningDark, toolbar);
 
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    }
 
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
-        window.setStatusBarColor(getResources().getColor(R.color.colorWarningDark));
+        nfc_kmt nfcFragment = (nfc_kmt) getSupportFragmentManager().findFragmentByTag("NFC_FRAGMENT");
+        Log.i("awe", "onNewIntent: INTENT_TRIGGERED");
+       if(nfcFragment != null && nfcFragment.isAdded() && nfcFragment.isVisible() && nfcFragment.getUserVisibleHint()){
+           Log.i("awe", "onNewIntent: FRAGMENT_VISIBLE");
+           if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
+               Log.i("awe", "onNewIntent: TECH_DISCOVERED");
+               Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+               String KMT_UID = bin2hex(tag.getId());;
 
-        toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorWarning)));
+               nfcFragment.KmtDiscovered(KMT_UID);
+           }
+       }
+
+    }
+
+    static String bin2hex(byte[] data) {
+        return String.format("%0" + (data.length * 2) + "X", new BigInteger(1,data));
     }
 
     @Override
@@ -91,13 +115,14 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.pos_krl) {
-            // Handle the camera action
+
         } else if (id == R.id.timetable) {
 
         } else if (id == R.id.tariff) {
 
         } else if (id == R.id.check_card) {
-
+            Fragment fragment = new nfc_kmt();
+            displaySpecificFragment(fragment,"NFC_FRAGMENT");
         } else if (id == R.id.settings) {
 
         }
@@ -107,12 +132,23 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    private void displaySpecificFragment(Fragment fragment){
+    private void displaySpecificFragment(Fragment fragment, String Tags){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame, fragment);
+        fragmentTransaction.replace(R.id.frame, fragment, Tags);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+    public void changeStatusBarAndToolbar(int color, int colorDark,Toolbar toolbar){
+        Window window = getWindow();
 
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        window.setStatusBarColor(getResources().getColor(colorDark));
+
+        toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(color)));
+    }
     @Override
     public void onFragmentInteraction(Uri uri){
 

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.a4sc11production.krlassist">
+    <!--Permission-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <!--Features-->
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+
 
     <application
             android:allowBackup="true"
@@ -9,20 +17,40 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity">
         </activity>
+
         <activity android:name=".walkthrough">
         </activity>
+
         <activity
                 android:name=".HomeActivity"
                 android:label="@string/title_activity_home"
+                android:launchMode="singleTask"
                 android:theme="@style/AppTheme.ActionBar.Transparent">
+            <!--Main Activity-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!--NFC Intent-->
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.nfc.action.TECH_DISCOVERED"
+                    android:resource="@xml/nfc_tech_filter" />
+            <!--END NFC Intent-->
         </activity>
+
     </application>
 
 </manifest>

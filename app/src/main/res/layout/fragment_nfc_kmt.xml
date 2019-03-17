@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             tools:context=".fragments.nfc_kmt"
+             android:background="@color/colorNormal">
+    <com.kennyc.view.MultiStateView
+            android:id="@+id/nfc_status_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:msv_errorView="@layout/nfc_state_error"
+            app:msv_loadingView="@layout/nfc_state_wait_scan">
+        <LinearLayout
+                android:layout_marginTop="35dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kartu Multi Trip"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="22sp"/>
+            <TextView
+                    android:id="@+id/kmt_uid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100131023014"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="22sp"/>
+            <ImageView
+                    android:layout_marginTop="35dp"
+                    android:layout_width="250dp"
+                    android:layout_height="157dp"
+                    android:src="@drawable/ic_kmt"/>
+            <TextView
+                    android:layout_marginTop="25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Saldo"/>
+            <LinearLayout
+                    android:layout_marginTop="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_gravity="bottom"
+                        android:text="Rp."/>
+                <TextView
+                        android:id="@+id/kmt_bal_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="32sp"
+                        android:text="3000"/>
+            </LinearLayout>
+            <TextView
+                    android:layout_marginTop="25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:drawableEnd="@drawable/ic_caret_right"
+                    android:drawablePadding="15dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Sejarah Transaksi"/>
+
+        </LinearLayout>
+    </com.kennyc.view.MultiStateView>
+
+
+
+</FrameLayout>
