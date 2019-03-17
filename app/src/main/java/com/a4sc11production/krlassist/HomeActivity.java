@@ -20,13 +20,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import com.a4sc11production.krlassist.fragments.home;
+import com.a4sc11production.krlassist.fragments.krl_pos;
 import com.a4sc11production.krlassist.fragments.nfc_kmt;
 
 import java.math.BigInteger;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
-        nfc_kmt.OnFragmentInteractionListener{
+        nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +116,8 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.pos_krl) {
-
+            Fragment fragment = new krl_pos();
+            displaySpecificFragment(fragment,"REALTIME_POS_FRAGMENT");
         } else if (id == R.id.timetable) {
 
         } else if (id == R.id.tariff) {
