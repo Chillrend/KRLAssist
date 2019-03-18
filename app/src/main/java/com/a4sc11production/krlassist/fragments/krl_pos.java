@@ -10,12 +10,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.*;
 
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.adapter.RealtimePositionAdapter;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
+import com.a4sc11production.krlassist.model.RealtimePosition;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import es.dmoral.toasty.Toasty;
@@ -40,9 +39,13 @@ public class krl_pos extends Fragment {
 
     private String[] testingAutoComplete = {"Bleh", "Blah", "Bloh", "Blih", "Bluh"};
     private AutoCompleteTextView stasiunChooser;
+    private ListView realtime_pos_listview;
 
     private ArrayList<StasiunSpinner> StasiunList;
     private StasiunSpinnerAdapter stasiunAdapter;
+
+    private ArrayList<RealtimePosition> realtimeList;
+    private RealtimePositionAdapter realtimeAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -123,7 +126,20 @@ public class krl_pos extends Fragment {
             }
         });
 
+        realtime_pos_listview = (ListView) view.findViewById(R.id.realtime_pos_listview);
 
+        realtimeList = new ArrayList<>();
+        realtimeList.add(new RealtimePosition("D1/1270", "Nambo - Angke", "Berangkat Cibinong", "Loop Line", 8));
+        realtimeList.add(new RealtimePosition("1571", "Bogor - Jakarta Kota", "Di Citayam", "Central Line", 12));
+        realtimeList.add(new RealtimePosition("1080-1081", "Bogor - Jatinegara", "Di Bojong Gede", "Loop Line", 8));
+        realtimeList.add(new RealtimePosition("1921", "Bogor - Angke", "Berangkat Bogor", "Loop Line", 10));
+        realtimeList.add(new RealtimePosition("D1/1511", "Angke - Nambo", "Di Pondok Cina", "Loop Line", 10));
+        realtimeList.add(new RealtimePosition("1611", "Jakarta Kota - Bogor", "Berangkat Univ. Indonesia", "Central Line", 12));
+        realtimeList.add(new RealtimePosition("1271", "Jakarta Kota - Bogor", "Berangkat Lenteng Agung", "Central Line", 8));
+
+        realtimeAdapter = new RealtimePositionAdapter(realtimeList, getContext());
+
+        realtime_pos_listview.setAdapter(realtimeAdapter);
     }
 
 

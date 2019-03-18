@@ -18,4 +18,12 @@
     <color name="colorNormal">#00bfa5</color>
     <color name="colorNormalDark">#008e76</color>
 
+    <color name="defaultLine">#9e9e9e</color>
+    <color name="RedLine">#F44336</color>
+    <color name="LoopLine">#fbc02d</color>
+    <color name="BekasiLine">#2196f3</color>
+    <color name="TanggerangLine">#4caf50</color>
+    <color name="RangkasbitungLine">#8d6e63</color>
+    <color name="TanjungPriokLine">#f06292</color>
+
 </resources>
