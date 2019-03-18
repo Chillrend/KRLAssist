@@ -48,7 +48,7 @@
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.8"
-                        android:background="@drawable/walkthrough_button"
+                        android:background="@drawable/background_walkthrough_button"
                         android:clickable="true">
                     <LinearLayout
                             android:layout_width="match_parent"
@@ -95,7 +95,7 @@
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.8"
-                        android:background="@drawable/walkthrough_button"
+                        android:background="@drawable/background_walkthrough_button"
                         android:clickable="true">
                     <LinearLayout
                             android:layout_width="match_parent"

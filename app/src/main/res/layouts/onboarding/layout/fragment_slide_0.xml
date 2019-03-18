@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
                 android:layout_marginTop="100dp"
-                android:src="@drawable/krl"/>
+                android:src="@drawable/ic_krl"/>
 
     </LinearLayout>
 

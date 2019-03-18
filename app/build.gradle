@@ -23,8 +23,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets{
+        main{
+            res.srcDirs =
+                    [
+                        'src/main/res/layouts/activities',
+                        'src/main/res/layouts/fragments',
+                        'src/main/res/layouts/multistate',
+                        'src/main/res/layouts/navigation',
+                        'src/main/res/layouts/onboarding',
+                        'src/main/res/layouts/row',
+                        'src/main/res/layouts',
+                        'src/main/res'
+                    ]
+        }
+    }
+
     productFlavors {
     }
+
 }
 
 dependencies {
