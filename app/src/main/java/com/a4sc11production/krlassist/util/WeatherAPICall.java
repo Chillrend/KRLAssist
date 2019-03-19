@@ -16,7 +16,7 @@ public class WeatherAPICall {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.openweathermap.org/data/2.5")
+                .baseUrl("http://api.openweathermap.org/data/2.5/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();

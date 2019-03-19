@@ -3,6 +3,7 @@ package com.a4sc11production.krlassist;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -19,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.fragments.home;
 import com.a4sc11production.krlassist.fragments.krl_pos;
@@ -29,6 +31,7 @@ import com.a4sc11production.krlassist.model.weather.WeatherModel;
 import com.a4sc11production.krlassist.model.weather.Wind;
 import com.a4sc11production.krlassist.util.APIInterface.WeatherAPIInterface;
 import com.a4sc11production.krlassist.util.WeatherAPICall;
+import com.kennyc.view.MultiStateView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -60,12 +63,20 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
+        TextView weather_city_name = (TextView) headerView.findViewById(R.id.weather_city_name);
+        TextView weather_temp = (TextView) headerView.findViewById(R.id.weather_temperature);
+        TextView weather_humidity = (TextView) headerView.findViewById(R.id.weather_humidity);
+        TextView weather_wind_speed = (TextView) headerView.findViewById(R.id.weather_wind_speed);
+        ImageView icon_weather = (ImageView) headerView.findViewById(R.id.drawable_weather);
+        MultiStateView weather_state = (MultiStateView) headerView.findViewById(R.id.multi_state_header);
+        weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
 
         WeatherAPICall apiCall = new WeatherAPICall();
 
         apiInterface = apiCall.getClient().create(WeatherAPIInterface.class);
+        String urls = "http://api.openweathermap.org/data/2.5/weather?q=Depok,id&units=metric&appid=b0b1585868743006b048c5261e30ea84";
 
-        Call<WeatherModel> call = apiInterface.getWeather("Depok");
+        Call<WeatherModel> call = apiInterface.getWeather(urls);
         call.enqueue(new Callback<WeatherModel>() {
             @Override
             public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
@@ -74,7 +85,8 @@ public class HomeActivity extends AppCompatActivity
 
                 try{
                     WeatherModel weatherNow = response.body();
-                    String weather_name, icon;
+                    String weather_name = "";
+                    String icon = "";
 
                     List<Weather> weatherDesc = weatherNow.getWeather();
                     for (Weather weather : weatherDesc){
@@ -85,18 +97,44 @@ public class HomeActivity extends AppCompatActivity
                     String Temperature = Double.toString(TempAndHumid.getTemp()).substring(0,2);
                     String Humidity = String.valueOf(TempAndHumid.getHumidity());
 
+                    String city = weatherNow.getName();
+
                     Wind wind = weatherNow.getWind();
                     String wind_speed = String.valueOf(wind.getSpeed());
 
+                    weather_city_name.setText(city);
+                    weather_humidity.setText(Humidity + "%");
+                    weather_temp.setText(Temperature);
+                    weather_wind_speed.setText(wind_speed + " m/s");
+
+                    if(weather_name.equals("Thunderstorm")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_thunderstorm);
+                    }else if(weather_name.equals("Drizzle")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_drizzle);
+                    }else if(weather_name.equals("Rain")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_rain);
+                    }else if(weather_name.equals("Clear")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_clear);
+                    }else if(weather_name.equals("Clouds")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_cloudy);
+                    }else if(icon.equals("50d") || icon.equals("50n")){
+                        icon_weather.setImageResource(R.drawable.ic_weather_drizzle);
+                    }
+                    weather_state.setViewState(MultiStateView.VIEW_STATE_CONTENT);
+
+
                 }catch (Exception e){
                     e.printStackTrace();
+
+                    weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
+
                 }
 
             }
 
             @Override
             public void onFailure(Call<WeatherModel> call, Throwable t) {
-
+                weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
             }
         });
 

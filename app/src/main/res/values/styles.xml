@@ -28,6 +28,10 @@
         <item name="colorPrimary">@android:color/transparent</item>
     </style>
 
+    <style name="BlackText">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
     <style name="AppTheme.ActionBar" parent="AppTheme">
         <item name="windowActionBarOverlay">false</item>
         <item name="colorPrimary">@color/colorPrimary</item>
