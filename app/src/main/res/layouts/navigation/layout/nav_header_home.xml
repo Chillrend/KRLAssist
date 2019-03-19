@@ -59,23 +59,23 @@
                 android:drawablePadding="5dp"/>
         <TextView
                 android:layout_marginLeft="15dp"
-                android:id="@+id/weather_raining_chance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:fontFamily="sans-serif-light"
-                android:text="40%"
-                android:drawableLeft="@drawable/ic_rain_chance"
-                android:drawablePadding="5dp"/>
-        <TextView
-                android:layout_marginLeft="15dp"
                 android:id="@+id/weather_humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:fontFamily="sans-serif-light"
-                android:text="20%"
+                android:text="40%"
                 android:drawableLeft="@drawable/ic_humid"
+                android:drawablePadding="5dp"/>
+        <TextView
+                android:layout_marginLeft="15dp"
+                android:id="@+id/weather_wind_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-light"
+                android:text="20%"
+                android:drawableLeft="@drawable/ic_wind_speed"
                 android:drawablePadding="5dp"/>
     </LinearLayout>
     <TextView

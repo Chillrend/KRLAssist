@@ -19,15 +19,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 import com.a4sc11production.krlassist.fragments.home;
 import com.a4sc11production.krlassist.fragments.krl_pos;
 import com.a4sc11production.krlassist.fragments.nfc_kmt;
+import com.a4sc11production.krlassist.model.weather.Main;
+import com.a4sc11production.krlassist.model.weather.Weather;
+import com.a4sc11production.krlassist.model.weather.WeatherModel;
+import com.a4sc11production.krlassist.model.weather.Wind;
+import com.a4sc11production.krlassist.util.APIInterface.WeatherAPIInterface;
+import com.a4sc11production.krlassist.util.WeatherAPICall;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
         nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener{
+    WeatherAPIInterface apiInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +58,47 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.getHeaderView(0);
+
+        WeatherAPICall apiCall = new WeatherAPICall();
+
+        apiInterface = apiCall.getClient().create(WeatherAPIInterface.class);
+
+        Call<WeatherModel> call = apiInterface.getWeather("Depok");
+        call.enqueue(new Callback<WeatherModel>() {
+            @Override
+            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
+
+                String displayResponses = "";
+
+                try{
+                    WeatherModel weatherNow = response.body();
+                    String weather_name, icon;
+
+                    List<Weather> weatherDesc = weatherNow.getWeather();
+                    for (Weather weather : weatherDesc){
+                        weather_name = weather.getMain();
+                        icon = weather.getIcon();
+                    }
+                    Main TempAndHumid = weatherNow.getMain();
+                    String Temperature = Double.toString(TempAndHumid.getTemp()).substring(0,2);
+                    String Humidity = String.valueOf(TempAndHumid.getHumidity());
+
+                    Wind wind = weatherNow.getWind();
+                    String wind_speed = String.valueOf(wind.getSpeed());
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<WeatherModel> call, Throwable t) {
+
+            }
+        });
 
         Fragment defaultFragment = new home();
 
