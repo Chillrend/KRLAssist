@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.fragments.home;
+import com.a4sc11production.krlassist.fragments.jadwal;
 import com.a4sc11production.krlassist.fragments.krl_pos;
 import com.a4sc11production.krlassist.fragments.nfc_kmt;
 import com.a4sc11production.krlassist.model.weather.Main;
@@ -42,7 +43,8 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
-        nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener{
+        nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener,
+        jadwal.OnFragmentInteractionListener{
     WeatherAPIInterface apiInterface;
 
     @Override
@@ -211,7 +213,8 @@ public class HomeActivity extends AppCompatActivity
             Fragment fragment = new krl_pos();
             displaySpecificFragment(fragment,"REALTIME_POS_FRAGMENT");
         } else if (id == R.id.timetable) {
-
+            Fragment fragment = new jadwal();
+            displaySpecificFragment(fragment,"TIMETABLE_FRAGMENT");
         } else if (id == R.id.tariff) {
 
         } else if (id == R.id.check_card) {

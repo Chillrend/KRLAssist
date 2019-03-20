@@ -28,6 +28,24 @@
         <item name="colorPrimary">@android:color/transparent</item>
     </style>
 
+    <style name="MyCustomBetterPickersDialogs" parent="BetterPickersRadialTimePickerDialog.PrimaryColor">
+        <item name="bpPreHeaderBackgroundColor">@color/colorPrimaryDark</item>
+        <item name="bpHeaderBackgroundColor">@color/colorPrimary</item>
+        <item name="bpHeaderSelectedTextColor">@color/bpWhite</item>
+        <item name="bpHeaderUnselectedTextColor">@android:color/white</item>
+
+        <item name="bpBodyBackgroundColor">@color/bpWhite</item>
+        <item name="bpBodySelectedTextColor">@android:color/black</item>
+        <item name="bpBodyUnselectedTextColor">@android:color/black</item>
+
+        <item name="bpRadialBackgroundColor">@color/bpWhite</item>
+        <item name="bpRadialTextColor">@android:color/black</item>
+        <item name="bpRadialPointerColor">@android:color/black</item>
+
+        <item name="bpButtonsBackgroundColor">@color/bpWhite</item>
+        <item name="bpButtonsTextColor">@color/bpblack</item>
+    </style>
+
     <style name="BlackText">
         <item name="android:textColor">@android:color/black</item>
     </style>
