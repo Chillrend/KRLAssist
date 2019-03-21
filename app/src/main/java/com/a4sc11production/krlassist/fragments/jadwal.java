@@ -11,13 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
+import com.a4sc11production.krlassist.adapter.TimetableAdapter;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
+import com.a4sc11production.krlassist.model.Timetable;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import es.dmoral.toasty.Toasty;
@@ -49,6 +48,9 @@ public class jadwal extends Fragment {
     private Date date_now = new Date();
 
     private StasiunSpinnerAdapter stasiunAdapter;
+
+    private ArrayList<Timetable> timetableList;
+    private TimetableAdapter timetableAdapter;
 
     private AutoCompleteTextView stasiunChooser;
     private EditText time_picker_1, time_picker_2;
@@ -131,6 +133,22 @@ public class jadwal extends Fragment {
                 Toasty.info(getContext(), "Anda Memilih " + stasiun_id, Toast.LENGTH_SHORT, true).show();
             }
         });
+
+        timetableList = new ArrayList<>();
+        timetableList.add(new Timetable("1800-1801","Bogor - Jatinegara", "Manggarai", "Loop Line", "9:22"));
+        timetableList.add(new Timetable("1920","Bogor - Jakarta Kota", "Manggarai", "Central Line", "9:22"));
+        timetableList.add(new Timetable("D1/1270","Jakarta Kota - Bekasi", "Manggarai", "Bekasi Line", "9:22"));
+        timetableList.add(new Timetable("1511","Bogor - Angke", "Manggarai", "Loop Line", "9:22"));
+        timetableList.add(new Timetable("1628","Depok - Angke", "Manggarai", "Loop Line", "9:22"));
+        timetableList.add(new Timetable("1788","Bogor - Jakarta Kota", "Manggarai", "Central Line", "9:22"));
+
+
+
+        ListView lv = (ListView) view.findViewById(R.id.timetable_list);
+        timetableAdapter = new TimetableAdapter(timetableList,getContext());
+        lv.setAdapter(timetableAdapter);
+
+
 
         time_picker_1 = (EditText) view.findViewById(R.id.time_picker_1);
         time_picker_2 = (EditText) view.findViewById(R.id.time_picker_2);

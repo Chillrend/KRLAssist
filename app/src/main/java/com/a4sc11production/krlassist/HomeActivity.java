@@ -27,10 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.a4sc11production.krlassist.fragments.home;
-import com.a4sc11production.krlassist.fragments.jadwal;
-import com.a4sc11production.krlassist.fragments.krl_pos;
-import com.a4sc11production.krlassist.fragments.nfc_kmt;
+import com.a4sc11production.krlassist.fragments.*;
 import com.a4sc11production.krlassist.model.weather.Main;
 import com.a4sc11production.krlassist.model.weather.Weather;
 import com.a4sc11production.krlassist.model.weather.WeatherModel;
@@ -51,7 +48,7 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
         nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener,
-        jadwal.OnFragmentInteractionListener{
+        jadwal.OnFragmentInteractionListener, line_status.OnFragmentInteractionListener{
 
     MultiStateView weather_state;
     TextView weather_city_name,weather_temp,weather_humidity,weather_wind_speed;
@@ -276,6 +273,9 @@ public class HomeActivity extends AppCompatActivity
             displaySpecificFragment(fragment,"NFC_FRAGMENT");
         } else if (id == R.id.settings) {
 
+        } else if (id == R.id.home) {
+            Fragment fragment = new home();
+            displaySpecificFragment(fragment,"HOME_FRAGMENT");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -283,7 +283,7 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    private void displaySpecificFragment(Fragment fragment, String Tags){
+    public void displaySpecificFragment(Fragment fragment, String Tags){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment, Tags);
         fragmentTransaction.addToBackStack(null);

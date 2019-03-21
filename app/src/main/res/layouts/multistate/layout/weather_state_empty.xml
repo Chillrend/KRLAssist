@@ -8,13 +8,14 @@
             android:id="@+id/button_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:onClick="callWeatherApi"
             android:src="@drawable/ic_autorenew"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:text="Klik Tombol diatas untuk melihat cuaca"/>
 
 </LinearLayout>

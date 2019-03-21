@@ -3,11 +3,15 @@ package com.a4sc11production.krlassist.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.LinearLayout;
+import com.a4sc11production.krlassist.HomeActivity;
 import com.a4sc11production.krlassist.R;
 
 /**
@@ -66,6 +70,19 @@ public class home extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
+    }
+    public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        LinearLayout info_lanjut_btn = (LinearLayout) view.findViewById(R.id.btn_info_lanjut);
+        info_lanjut_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new line_status();
+                ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "LINE_STATUS_FRAGMENT");
+            }
+        });
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
