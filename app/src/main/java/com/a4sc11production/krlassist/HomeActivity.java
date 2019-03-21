@@ -3,11 +3,16 @@ package com.a4sc11production.krlassist;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.media.Image;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -31,6 +36,7 @@ import com.a4sc11production.krlassist.model.weather.Weather;
 import com.a4sc11production.krlassist.model.weather.WeatherModel;
 import com.a4sc11production.krlassist.model.weather.Wind;
 import com.a4sc11production.krlassist.util.APIInterface.WeatherAPIInterface;
+import com.a4sc11production.krlassist.util.SingleShotLocationProvider;
 import com.a4sc11production.krlassist.util.WeatherAPICall;
 import com.kennyc.view.MultiStateView;
 import retrofit2.Call;
@@ -39,21 +45,39 @@ import retrofit2.Response;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
         nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener,
         jadwal.OnFragmentInteractionListener{
+
+    MultiStateView weather_state;
+    TextView weather_city_name,weather_temp,weather_humidity,weather_wind_speed;
+    ImageView icon_weather;
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
     WeatherAPIInterface apiInterface;
+    String lat, lng;
+    Boolean hasLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new getLoc().execute("");
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -65,18 +89,56 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
-        TextView weather_city_name = (TextView) headerView.findViewById(R.id.weather_city_name);
-        TextView weather_temp = (TextView) headerView.findViewById(R.id.weather_temperature);
-        TextView weather_humidity = (TextView) headerView.findViewById(R.id.weather_humidity);
-        TextView weather_wind_speed = (TextView) headerView.findViewById(R.id.weather_wind_speed);
-        ImageView icon_weather = (ImageView) headerView.findViewById(R.id.drawable_weather);
-        MultiStateView weather_state = (MultiStateView) headerView.findViewById(R.id.multi_state_header);
-        weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
+        weather_city_name = (TextView) headerView.findViewById(R.id.weather_city_name);
+        weather_temp = (TextView) headerView.findViewById(R.id.weather_temperature);
+        weather_humidity = (TextView) headerView.findViewById(R.id.weather_humidity);
+        weather_wind_speed = (TextView) headerView.findViewById(R.id.weather_wind_speed);
+        icon_weather = (ImageView) headerView.findViewById(R.id.drawable_weather);
+        weather_state = (MultiStateView) headerView.findViewById(R.id.multi_state_header);
+        weather_state.setViewState(MultiStateView.VIEW_STATE_EMPTY);
+        hasLocation = false;
 
+        Fragment defaultFragment = new home();
+
+        displaySpecificFragment(defaultFragment, "HOME_FRAGMENT");
+
+        changeStatusBarAndToolbar(R.color.colorWarning,R.color.colorWarningDark, toolbar);
+
+    }
+
+    private class getLoc extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected void onPreExecute(){
+            SingleShotLocationProvider.requestSingleUpdate(getApplicationContext(), new SingleShotLocationProvider.LocationCallback() {
+                @Override
+                public void onNewLocationAvailable(SingleShotLocationProvider.GPSCoordinates location) {
+
+                    Log.i("Location", "Location is :" + location.getLatitude() + " - " + location.getLongitude());
+                    lat = Float.toString(location.getLatitude());
+                    lng = Float.toString(location.getLongitude());
+                    hasLocation = true;
+
+                }
+            });
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+        }
+    }
+
+    public void callWeatherApi(View view){
+        weather_state.setViewState(MultiStateView.VIEW_STATE_LOADING);
         WeatherAPICall apiCall = new WeatherAPICall();
 
         apiInterface = apiCall.getClient().create(WeatherAPIInterface.class);
-        String urls = "http://api.openweathermap.org/data/2.5/weather?q=Depok,id&units=metric&appid=b0b1585868743006b048c5261e30ea84";
+        String urls = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng +"&units=metric&appid=b0b1585868743006b048c5261e30ea84";
 
         Call<WeatherModel> call = apiInterface.getWeather(urls);
         call.enqueue(new Callback<WeatherModel>() {
@@ -127,26 +189,18 @@ public class HomeActivity extends AppCompatActivity
 
                 }catch (Exception e){
                     e.printStackTrace();
-
                     weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
-
                 }
-
             }
-
             @Override
             public void onFailure(Call<WeatherModel> call, Throwable t) {
                 weather_state.setViewState(MultiStateView.VIEW_STATE_ERROR);
+                t.printStackTrace();
             }
         });
 
-        Fragment defaultFragment = new home();
-
-        displaySpecificFragment(defaultFragment, "HOME_FRAGMENT");
-
-        changeStatusBarAndToolbar(R.color.colorWarning,R.color.colorWarningDark, toolbar);
-
     }
+
 
     @Override
     protected void onNewIntent(Intent intent) {

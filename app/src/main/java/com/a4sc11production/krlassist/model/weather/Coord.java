@@ -8,24 +8,24 @@ public class Coord {
 
     @SerializedName("lon")
     @Expose
-    private Double lon;
+    private float lon;
     @SerializedName("lat")
     @Expose
-    private Double lat;
+    private float lat;
 
-    public Double getLon() {
+    public float getLon() {
         return lon;
     }
 
-    public void setLon(Double lon) {
+    public void setLon(Integer lon) {
         this.lon = lon;
     }
 
-    public Double getLat() {
+    public float getLat() {
         return lat;
     }
 
-    public void setLat(Double lat) {
+    public void setLat(Integer lat) {
         this.lat = lat;
     }
 

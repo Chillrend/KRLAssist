@@ -145,7 +145,7 @@ public class jadwal extends Fragment {
         cal.setTime(date_now);
 
         String hour_def = hours_default.format(cal.getTime());
-        String minute_def = hours_default.format(cal.getTime());
+        String minute_def = minute_default.format(cal.getTime());
 
         time_1 = hour_def + ":" + minute_def;
         time_picker_1.setText(time_1);
@@ -153,7 +153,7 @@ public class jadwal extends Fragment {
         cal.add(Calendar.HOUR_OF_DAY, 3);
 
         String hour_last_def = hours_default.format(cal.getTime());
-        String minute_last_def = hours_default.format(cal.getTime());
+        String minute_last_def = minute_default.format(cal.getTime());
 
         time_2 = hour_last_def + ":" + minute_last_def;
         time_picker_2.setText(time_2);

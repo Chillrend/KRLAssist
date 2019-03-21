@@ -17,7 +17,9 @@
             android:id="@+id/multi_state_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:msv_errorView="@layout/weather_state_error">
+            app:msv_errorView="@layout/weather_state_error"
+            app:msv_loadingView="@layout/weather_state_loading"
+            app:msv_emptyView="@layout/weather_state_empty">
 
         <RelativeLayout
                 android:layout_width="match_parent"
