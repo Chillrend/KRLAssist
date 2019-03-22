@@ -20,10 +20,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.model.KMT.Kmt;
+import com.a4sc11production.krlassist.model.KMT.MultiTrip;
+import com.a4sc11production.krlassist.util.APIInterface.KMTInterface;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.kennyc.view.MultiStateView;
 import com.a4sc11production.krlassist.HomeActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.math.BigInteger;
+import java.util.List;
 
 
 /**
@@ -46,6 +54,8 @@ public class nfc_kmt extends Fragment {
 
     private NfcAdapter mNfcAdapter;
     private String KMT_UID;
+
+    private KMTInterface kmtInterface;
 
     private MultiStateView mMultiStateView;
     private TextView kmt_uid_text, kmt_bal;
@@ -113,8 +123,39 @@ public class nfc_kmt extends Fragment {
     }
 
     public void KmtDiscovered(String UIDS){
+        View v = getView();
+        TextView kmtBals = v.findViewById(R.id.kmt_bal_amount);
         mMultiStateView.setViewState(MultiStateView.VIEW_STATE_CONTENT);
         kmt_uid_text.setText(UIDS);
+        KeretaAPICall krlapi = new KeretaAPICall();
+
+        kmtInterface = krlapi.getClient().create(KMTInterface.class);
+        String urls = "https://api.clude.xyz/kmt/" + UIDS;
+
+        Call<MultiTrip> calls = kmtInterface.getBalance(urls);
+        calls.enqueue(new Callback<MultiTrip>() {
+            @Override
+            public void onResponse(Call<MultiTrip> call, Response<MultiTrip> response) {
+                String display_response = "";
+
+                try{
+                    MultiTrip kmt = response.body();
+
+                    List<Kmt> jsonResponse = kmt.getKmt();
+
+                    for(Kmt kmte : jsonResponse){
+                        kmtBals.setText(Integer.toString(kmte.getBalance()));
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MultiTrip> call, Throwable t) {
+
+            }
+        });
     }
 
 

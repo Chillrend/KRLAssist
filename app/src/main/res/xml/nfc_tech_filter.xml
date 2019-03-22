@@ -17,5 +17,9 @@
         <tech-list>
             <tech>android.nfc.tech.NfcA</tech>
         </tech-list>>
+        <!-- FeLiCa KMT Tag -->
+        <tech-list>
+            <tech>android.nfc.tech.NfcF</tech>
+        </tech-list>>
     </tech-list>
 </resources>

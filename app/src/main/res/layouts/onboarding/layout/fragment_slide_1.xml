@@ -9,71 +9,137 @@
              tools:context=".onboardingSlide.slide_1"
             >
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:layout_gravity="center"
-                  android:gravity="center">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center">
+
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="First, Select which line you commute with"
+                android:text="Pertama, pilih jalur yang sering anda lewati"
                 android:gravity="center"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"/>
+                android:textSize="18sp"/>
+
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
+                android:fontFamily="sans-serif-light"
                 android:gravity="center"
-                android:text="We will show you about this line's statuses and check if there are force majeure in the line"
-                android:textSize="12sp"/>
+                android:text="Kami akan menunjukkan status terkini mengenai jalur yang anda lewati"
+                android:textSize="16sp"/>
 
         <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginTop="50dp">
+                android:layout_marginTop="15dp"
+                android:layout_height="wrap_content">
             <!--button-->
+
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:weightSum="1"
-                    android:gravity="center">
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:gravity="center"
+                    android:weightSum="1">
+
                 <LinearLayout
-                        android:id="@+id/loop_line"
+                        android:id="@+id/red_line"
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.8"
+                        android:layout_weight="0.9"
                         android:background="@drawable/background_walkthrough_button"
                         android:clickable="true">
+
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:padding="10dp">
+
                         <ImageView
                                 android:layout_width="38dp"
                                 android:layout_height="38dp"
-                                android:src="@drawable/ic_loop_line"/>
+                                android:gravity="center"
+                                android:src="@drawable/ic_red_line"/>
+
                         <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:layout_marginLeft="10dp">
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Red Line"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="18sp"/>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Bogor - Jakarta Kota"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/white"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:weightSum="1"
+                    android:gravity="center">
+
+                <LinearLayout
+                        android:id="@+id/loop_line"
+                        android:layout_width="0px"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:background="@drawable/background_walkthrough_button"
+                        android:clickable="true">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="10dp">
+
+                        <ImageView
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:src="@drawable/ic_loop_line"/>
+
+                        <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginLeft="10dp">
+
                             <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Loop Line"
                                     android:textColor="@android:color/white"
                                     android:textSize="18sp"/>
+
                             <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Bogor (BOO)/Nambo (NMO) - Angke (AK)"
+                                    android:text="Bogor/Nambo - Angke"
                                     android:textColor="@android:color/white"
                                     android:textSize="12sp"/>
                         </LinearLayout>
@@ -85,49 +151,164 @@
             <!--button-->
             <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center"
-                    android:weightSum="1">
+                    android:weightSum="1"
+                    android:gravity="center">
+
                 <LinearLayout
-                        android:id="@+id/red_line"
+                        android:id="@+id/bekasi_line"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
                         android:layout_width="0px"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.8"
+                        android:layout_weight="0.9"
                         android:background="@drawable/background_walkthrough_button"
                         android:clickable="true">
+
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:padding="15dp">
+                            android:padding="10dp">
+
                         <ImageView
                                 android:layout_width="38dp"
                                 android:layout_height="38dp"
-                                android:gravity="center"
-                                android:src="@drawable/ic_red_line"/>
+                                android:src="@drawable/ic_bekasi_line"/>
+
                         <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:layout_marginLeft="10dp">
+
                             <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Red Line"
+                                    android:text="Bekasi Line"
                                     android:textColor="@android:color/white"
                                     android:textSize="18sp"/>
+
                             <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Bogor (BOO) - Jakarta Kota (JAKK)"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/white"/>
+                                    android:text="Jakarta Kota - Bekasi/Cikarang"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="12sp"/>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <!--end button-->
+            <!--button-->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:weightSum="1"
+                    android:gravity="center">
+
+                <LinearLayout
+                        android:id="@+id/tangerang_line"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:layout_width="0px"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:background="@drawable/background_walkthrough_button"
+                        android:clickable="true">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="10dp">
+
+                        <ImageView
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:src="@drawable/ic_tangerang_line_18dp"/>
+
+                        <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginLeft="10dp">
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tangerang Line"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="18sp"/>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Duri - Tangerang"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="12sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--end button-->
+            <!--button-->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:weightSum="1"
+                    android:gravity="center">
+
+                <LinearLayout
+                        android:id="@+id/rangkasbitung_line"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:layout_width="0px"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.9"
+                        android:background="@drawable/background_walkthrough_button"
+                        android:clickable="true">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="10dp">
+
+                        <ImageView
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:src="@drawable/ic_rangkasbitung_line_18dp"/>
+
+                        <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginLeft="10dp">
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rangkasbitung Line"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="18sp"/>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tanahabang - Rangkasbitung"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="12sp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
             <!--end button-->
         </LinearLayout>
 

@@ -2,6 +2,7 @@ package com.a4sc11production.krlassist;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -66,6 +68,30 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SharedPreferences getPrefs = getSharedPreferences("isFirstStart", MODE_PRIVATE);
+
+                boolean isFirstStart = getPrefs.getBoolean("isFirstStart", true);
+
+
+                if (isFirstStart){
+                    final Intent i = new Intent(HomeActivity.this, walkthrough.class);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivity(i);
+                        }
+                    });
+
+                }
+            }
+        });
+
+        t.start();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -116,13 +142,21 @@ public class HomeActivity extends AppCompatActivity
                     lng = Float.toString(location.getLongitude());
                     hasLocation = true;
 
+                    SharedPreferences.Editor editor = getSharedPreferences("LOCATION_STORAGE", MODE_PRIVATE).edit();
+                    editor.putString("lat", lat);
+                    editor.putString("lng", lng);
+                    editor.commit();
+
                 }
             });
         }
 
         @Override
         protected String doInBackground(String... strings) {
-            return null;
+
+
+
+            return "EXECUTED";
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.a4sc11production.krlassist.onboardingSlide;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
@@ -43,7 +44,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
     TextView tifaw;
 
     LinearLayout red_line;
-    LinearLayout loop_line;
+    LinearLayout loop_line, bekasi_line, tangerang_line, rangkasbitung_line;
 
     public slide_1() {
         // Required empty public constructor
@@ -80,9 +81,6 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-        
-        
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_slide_1, container, false);
     }
@@ -115,24 +113,85 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        loop_line = (LinearLayout) getView().findViewById(R.id.loop_line);
-        red_line = (LinearLayout) getView().findViewById(R.id.red_line);
+        loop_line = (LinearLayout) view.findViewById(R.id.loop_line);
+        red_line = (LinearLayout) view.findViewById(R.id.red_line);
+        bekasi_line = (LinearLayout) view.findViewById(R.id.bekasi_line);
+        tangerang_line = (LinearLayout) view.findViewById(R.id.tangerang_line);
+        rangkasbitung_line = (LinearLayout) view.findViewById(R.id.rangkasbitung_line);
+
 
         loop_line.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loop_line.setSelected(true);
                 red_line.setSelected(false);
+                bekasi_line.setSelected(false);
+                tangerang_line.setSelected(false);
+                rangkasbitung_line.setSelected(false);
+
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
+                editor.putString("def_line", "4");
+                editor.commit();
             }
         });
 
         red_line.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                red_line.setSelected(true);
                 loop_line.setSelected(false);
+                red_line.setSelected(true);
+                bekasi_line.setSelected(false);
+                tangerang_line.setSelected(false);
+                rangkasbitung_line.setSelected(false);
 
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
+                editor.putString("def_line", "1");
+                editor.commit();
+            }
+        });
 
+        bekasi_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loop_line.setSelected(false);
+                red_line.setSelected(false);
+                bekasi_line.setSelected(true);
+                tangerang_line.setSelected(false);
+                rangkasbitung_line.setSelected(false);
+
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
+                editor.putString("def_line", "13");
+                editor.commit();
+            }
+        });
+
+        tangerang_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loop_line.setSelected(false);
+                red_line.setSelected(false);
+                bekasi_line.setSelected(false);
+                tangerang_line.setSelected(true);
+                rangkasbitung_line.setSelected(false);
+
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
+                editor.putString("def_line", "14");
+                editor.commit();
+            }
+        });
+
+        rangkasbitung_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loop_line.setSelected(false);
+                red_line.setSelected(false);
+                bekasi_line.setSelected(false);
+                tangerang_line.setSelected(false);
+                rangkasbitung_line.setSelected(true);
+
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
+                editor.putString("def_line", "11");
+                editor.commit();
             }
         });
     }
@@ -156,7 +215,8 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
 
     @Override
     public boolean isPolicyRespected() {
-        if (loop_line.isSelected() || red_line.isSelected()){
+        if (loop_line.isSelected() || red_line.isSelected() || bekasi_line.isSelected() || rangkasbitung_line.isSelected()
+        || tangerang_line.isSelected()){
             return true;
         }else{
             return false;
@@ -165,7 +225,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
 
     @Override
     public void onUserIllegallyRequestedNextPage() {
-        Toasty.error(getContext(), "Please choose one of the line", Toast.LENGTH_SHORT, true).show();
+        Toasty.error(getContext(), "Silahkan pilih jalur telebih dahulu", Toast.LENGTH_SHORT, true).show();
         // User illegally requested next slide
     }
 

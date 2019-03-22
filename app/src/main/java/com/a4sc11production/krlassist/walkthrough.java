@@ -1,5 +1,7 @@
 package com.a4sc11production.krlassist;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -59,6 +61,13 @@ public class walkthrough extends AppIntro2 implements slide_1.OnFragmentInteract
 
                         lv.playAnimation();
 
+                        SharedPreferences sharedPreferences = getSharedPreferences("isFirstStart", MODE_PRIVATE);
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                        editor.putBoolean("isFirstStart", false);
+                        editor.commit();
+
                         break;
                 }
             }
@@ -76,6 +85,13 @@ public class walkthrough extends AppIntro2 implements slide_1.OnFragmentInteract
         super.onSlideChanged(oldFragment, newFragment);
 
 
+    }
+    @Override
+    public void onDonePressed() {
+        Intent i = new Intent(walkthrough.this, HomeActivity.class);
+        startActivity(i);
+        // Do something when users tap on Done button.
+        finish();
     }
 
     @Override
