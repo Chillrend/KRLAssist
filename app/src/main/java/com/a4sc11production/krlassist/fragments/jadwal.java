@@ -35,7 +35,7 @@ import java.util.Date;
  * Use the {@link jadwal#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class jadwal extends Fragment {
+public class jadwal extends Fragment implements RadialTimePickerDialogFragment.OnTimeSetListener{
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -46,6 +46,7 @@ public class jadwal extends Fragment {
     private String time_1,time_2,stasiun_id;
     private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
     private Date date_now = new Date();
+    private boolean isStartTimePicked = true;
 
     private StasiunSpinnerAdapter stasiunAdapter;
 
@@ -179,11 +180,14 @@ public class jadwal extends Fragment {
         time_picker_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isStartTimePicked = true;
+
                 RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
                         .setStartTime(Integer.parseInt(hour_def),Integer.parseInt(minute_def))
                         .setDoneText("Selesai")
                         .setThemeCustom(R.style.MyCustomBetterPickersDialogs)
                         .setForced24hFormat()
+                        .setOnTimeSetListener(jadwal.this)
                         .setCancelText("Batal");
 
                 rtpd.show(getFragmentManager(), FRAG_TAG_TIME_PICKER);
@@ -193,10 +197,13 @@ public class jadwal extends Fragment {
         time_picker_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isStartTimePicked = false;
+
                 RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
                         .setStartTime(Integer.parseInt(hour_last_def),Integer.parseInt(minute_last_def))
                         .setDoneText("Selesai")
                         .setCancelText("Batal")
+                        .setOnTimeSetListener(jadwal.this)
                         .setForced24hFormat()
                         .setThemeCustom(R.style.MyCustomBetterPickersDialogs);
                 rtpd.show(getFragmentManager(), FRAG_TAG_TIME_PICKER);
@@ -204,6 +211,15 @@ public class jadwal extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute){
+        if(isStartTimePicked){
+            time_picker_1.setText(hourOfDay + ":" + minute);
+        }else{
+            time_picker_2.setText(hourOfDay + ":" + minute);
+        }
     }
 
 

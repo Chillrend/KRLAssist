@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.  R;
 import com.a4sc11production.krlassist.model.Gangguan;
 
 import java.util.ArrayList;
