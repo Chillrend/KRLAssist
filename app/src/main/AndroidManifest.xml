@@ -56,6 +56,10 @@
             <!--END NFC Intent-->
         </activity>
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCzXmCZrs6Ox5sGL4nvZ6BqPFyucBIQXt8"
+            />
     </application>
 
 </manifest>

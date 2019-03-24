@@ -50,7 +50,8 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
         nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener,
-        jadwal.OnFragmentInteractionListener, line_status.OnFragmentInteractionListener, tariff.OnFragmentInteractionListener{
+        jadwal.OnFragmentInteractionListener, line_status.OnFragmentInteractionListener, tariff.OnFragmentInteractionListener,
+        route.OnFragmentInteractionListener{
 
     MultiStateView weather_state;
     TextView weather_city_name,weather_temp,weather_humidity,weather_wind_speed;
@@ -303,6 +304,9 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.tariff) {
             Fragment fragment = new tariff();
             displaySpecificFragment(fragment, "TARIFF_FRAGMENT");
+        } else if (id == R.id.route){
+            Fragment fragment = new route();
+            displaySpecificFragment(fragment, "ROUTE_FRAGMENT");
         } else if (id == R.id.check_card) {
             Fragment fragment = new nfc_kmt();
             displaySpecificFragment(fragment,"NFC_FRAGMENT");
