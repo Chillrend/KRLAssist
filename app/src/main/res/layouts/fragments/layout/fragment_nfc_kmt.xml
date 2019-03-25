@@ -11,7 +11,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:msv_errorView="@layout/nfc_state_error"
-            app:msv_loadingView="@layout/nfc_state_wait_scan">
+            app:msv_loadingView="@layout/nfc_state_wait_scan"
+            app:msv_emptyView="@layout/nfc_state_wait_async">
         <LinearLayout
                 android:layout_marginTop="35dp"
                 android:layout_width="match_parent"

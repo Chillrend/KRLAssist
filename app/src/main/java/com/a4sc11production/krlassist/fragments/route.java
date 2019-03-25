@@ -166,8 +166,8 @@ public class route extends Fragment {
 
                 String uri = buildDirectionURL(terminus1,terminus2);
 
-//                DownloadDirection downloadDirection = new DownloadDirection();
-//                downloadDirection.execute(uri);
+                DownloadDirection downloadDirection = new DownloadDirection();
+                downloadDirection.execute(uri);
 
 
 

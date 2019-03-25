@@ -125,7 +125,7 @@ public class nfc_kmt extends Fragment {
     public void KmtDiscovered(String UIDS){
         View v = getView();
         TextView kmtBals = v.findViewById(R.id.kmt_bal_amount);
-        mMultiStateView.setViewState(MultiStateView.VIEW_STATE_CONTENT);
+        mMultiStateView.setViewState(MultiStateView.VIEW_STATE_EMPTY);
         kmt_uid_text.setText(UIDS);
         KeretaAPICall krlapi = new KeretaAPICall();
 
@@ -146,6 +146,7 @@ public class nfc_kmt extends Fragment {
                     for(Kmt kmte : jsonResponse){
                         kmtBals.setText(Integer.toString(kmte.getBalance()));
                     }
+                    mMultiStateView.setViewState(MultiStateView.VIEW_STATE_CONTENT);
                 }catch (Exception e){
                     e.printStackTrace();
                 }

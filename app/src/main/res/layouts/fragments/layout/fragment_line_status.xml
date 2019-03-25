@@ -14,133 +14,20 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0px"
-                android:layout_weight=".35"
+                android:layout_weight=".2"
                 android:paddingLeft="25dp"
+                android:gravity="center_horizontal|center_vertical"
                 android:paddingBottom="25dp"
                 android:paddingRight="25dp"
-                android:background="@color/colorWarning"
+                android:background="@drawable/background_default_primary_top"
                 >
 
             <TextView
-                    android:id="@+id/status_gangguan_short_desc"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-bold"
-                    android:textSize="28sp"
-                    android:layout_alignParentLeft="true"
-                    android:maxLines="2"
-                    android:scrollHorizontally="false"
-                    android:text="Perbaikan Sinyal"
-                    />
-
-            <ImageView
-                    android:id="@+id/status_gangguan_icon"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_toLeftOf="@id/status_gangguan_affected_station"
-                    android:src="@drawable/ic_warning"/>
-
-            <TextView
-                    android:id="@+id/status_gangguan_affected_station"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:layout_below="@id/status_gangguan_short_desc"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginTop="8dp"
+                    android:textSize="24sp"
                     android:fontFamily="sans-serif-light"
-                    android:text="Stasiun Manggarai"/>
-
-            <TextView
-                    android:id="@+id/status_jalur_terganggu_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/status_gangguan_affected_station"
-                    android:textSize="16sp"
-                    android:fontFamily="sans-serif-light"
-                    android:text="Jalur Terganggu :"/>
-
-            <LinearLayout
-                    android:id="@+id/status_line_container_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/status_jalur_terganggu_text"
-                    android:layout_marginTop="8dp"
-                    android:layout_alignParentLeft="true"
-                    android:orientation="horizontal">
-
-                <ImageView
-                        android:id="@+id/status_icon_gangguan_line_1"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_red_line"/>
-
-                <TextView
-                        android:id="@+id/status_nama_line_gangguan_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:textSize="12sp"
-                        android:gravity="center_vertical"
-                        android:layout_marginStart="5dp"
-                        android:text="Red Line"/>
-            </LinearLayout>
-            <!--icon jalur dan nama jalur-->
-            <LinearLayout
-                    android:id="@+id/status_line_container_2"
-                    android:layout_width="wrap_content"
-                    android:layout_below="@id/status_jalur_terganggu_text"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@id/status_line_container_1"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                <ImageView
-                        android:id="@+id/status_icon_gangguan_line_2"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_loop_line"/>
-
-                <TextView
-                        android:id="@+id/status_nama_line_gangguan_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:layout_marginStart="5dp"
-                        android:textSize="12sp"
-                        android:text="Loop Line"/>
-            </LinearLayout>
-            <!--icon jalur dan nama jalur-->
-            <LinearLayout
-                    android:id="@+id/status_line_container_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/status_jalur_terganggu_text"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@id/status_line_container_2"
-                    android:orientation="horizontal">
-
-                <ImageView
-                        android:id="@+id/status_icon_gangguan_line_3"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_bekasi_line"/>
-
-                <TextView
-                        android:id="@+id/status_nama_line_gangguan_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:textSize="12sp"
-                        android:layout_marginStart="5dp"
-                        android:text="Bekasi Line"/>
-            </LinearLayout>
-
+                    android:text="Status Jalur"/>
         </RelativeLayout>
         <ListView
                 android:id="@+id/status_list"
@@ -149,7 +36,7 @@
                 android:scrollbars="none"
                 android:dividerHeight="0dp"
                 android:layout_height="0dp"
-                android:layout_weight=".65"/>
+                android:layout_weight=".8"/>
     </LinearLayout>
 
 </FrameLayout>

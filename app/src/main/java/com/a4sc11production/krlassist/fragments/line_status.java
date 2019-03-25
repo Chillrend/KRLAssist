@@ -7,16 +7,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.GangguanAdapter;
 import com.a4sc11production.krlassist.model.Gangguan;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
+import com.a4sc11production.krlassist.util.DialogShow;
+import es.dmoral.toasty.Toasty;
 
 import java.util.ArrayList;
 
@@ -85,20 +89,36 @@ public class line_status extends Fragment {
 
 
         ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
-        cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorWarning, R.color.colorWarningDark);
+        cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorPrimary, R.color.colorPrimaryDark);
 
 
         gangguanList = new ArrayList<>();
-        gangguanList.add(new Gangguan("Central Line", "Pergantian Masuk", "Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Loop Line", "Pergantian Masuk", "Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Bekasi Line", "Pergantian Masuk", "Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Tanjung Priok Line", "Perjalanan Normal", "None", "Normal"));
-        gangguanList.add(new Gangguan("Rangkasbitung Line", "Rel Patah", "Stasiun Rangkasbitung", "Severe"));
-        gangguanList.add(new Gangguan("Tangerang Line", "Perjalanan Normal", "None", "Normal"));
+        gangguanList.add(new Gangguan("Central Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai","Stasiun Manggarai", "Medium"));
+        gangguanList.add(new Gangguan("Loop Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai", "Stasiun Manggarai", "Medium"));
+        gangguanList.add(new Gangguan("Bekasi Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai","Stasiun Manggarai", "Medium"));
+        gangguanList.add(new Gangguan("Tanjung Priok Line", "Perjalanan Normal","Perjalanan Normal", "None", "Normal"));
+        gangguanList.add(new Gangguan("Rangkasbitung Line", "Rel Patah","Rel Patah diantara Lintas RK - THB, Alur lintas hulu hilir tidak dapat dilewati" ,"Stasiun Rangkasbitung", "Severe"));
+        gangguanList.add(new Gangguan("Tangerang Line", "Perjalanan Normal","", "None", "Normal"));
 
         ListView lv = view.findViewById(R.id.status_list);
         gangguanAdapter = new GangguanAdapter(gangguanList,getContext());
         lv.setAdapter(gangguanAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Gangguan g = gangguanList.get(position);
+
+                String line = g.getLine_name();
+                String short_desc = g.getShort_desc();
+                String long_desc = g.getLong_desc();
+                String severity = g.getSeverity();
+
+                DialogShow alert = new DialogShow();
+                alert.showDialogBox(getActivity(), line, long_desc, severity);
+
+            }
+        });
     }
 
 
@@ -137,7 +157,6 @@ public class line_status extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }
