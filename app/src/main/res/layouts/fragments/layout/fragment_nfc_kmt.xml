@@ -68,9 +68,11 @@
                         android:text="0"/>
             </LinearLayout>
             <TextView
+                    android:id="@+id/nfc_tx_history"
                     android:layout_marginTop="25dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
                     android:textSize="18sp"
                     android:drawableEnd="@drawable/ic_caret_right"
                     android:drawablePadding="15dp"

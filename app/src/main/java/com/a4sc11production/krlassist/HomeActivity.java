@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, home.OnFragmentInteractionListener,
         nfc_kmt.OnFragmentInteractionListener, krl_pos.OnFragmentInteractionListener,
         jadwal.OnFragmentInteractionListener, line_status.OnFragmentInteractionListener, tariff.OnFragmentInteractionListener,
-        route.OnFragmentInteractionListener{
+        route.OnFragmentInteractionListener, sejarah_tx.OnFragmentInteractionListener{
 
     MultiStateView weather_state;
     TextView weather_city_name,weather_temp,weather_humidity,weather_wind_speed;

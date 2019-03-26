@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.model.KMT.Kmt;
 import com.a4sc11production.krlassist.model.KMT.MultiTrip;
+import com.a4sc11production.krlassist.model.RealtimePos.Line;
 import com.a4sc11production.krlassist.util.APIInterface.KMTInterface;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.kennyc.view.MultiStateView;
@@ -118,6 +120,15 @@ public class nfc_kmt extends Fragment {
         }else{
             mMultiStateView.setViewState(MultiStateView.VIEW_STATE_LOADING);
         }
+
+        TextView tx_history_btn = (TextView) view.findViewById(R.id.nfc_tx_history);
+        tx_history_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new sejarah_tx();
+                ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "SEJARAH_TX_FRAGMENT");
+            }
+        });
 
 
     }

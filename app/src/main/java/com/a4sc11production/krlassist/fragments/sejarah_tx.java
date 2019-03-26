@@ -1,14 +1,24 @@
 package com.a4sc11production.krlassist.fragments;
 
+import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.Window;
+import android.widget.ListView;
 import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.adapter.TxAdapter;
+import com.a4sc11production.krlassist.model.TxTemporary;
+import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,11 +71,36 @@ public class sejarah_tx extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_sejarah_tx, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ArrayList<TxTemporary> temporarieslist = new ArrayList<>();
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Tanahabang", 5000));
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cibinong", 3000));
+        temporarieslist.add(new TxTemporary("ADDITION_STAT", "Cibinong", 50000));
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cikini", 5000));
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cibinong", 5000));
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Tambun", 7000));
+        temporarieslist.add(new TxTemporary("ADDITION_STAT", "Tambun", 10000));
+        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Depok", 8000));
+
+        TxAdapter txAdapter = new TxAdapter(temporarieslist, getContext());
+
+        ListView lv = view.findViewById(R.id.sejarah_tx_listview);
+
+        lv.setAdapter(txAdapter);
+
+        Window window = getActivity().getWindow();
+        ActionBar abar = (ActionBar) ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+        ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
+        cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorNormal, R.color.colorNormalDark);
+    }
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

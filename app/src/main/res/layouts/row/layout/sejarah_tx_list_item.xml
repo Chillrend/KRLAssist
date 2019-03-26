@@ -32,7 +32,7 @@
             android:layout_toRightOf="@id/tx_type_icon"
             android:layout_below="@id/tx_type"
             android:textSize="22sp"
-            android:text="Stasiun Cibinong"/>
+            android:text="Stasiun Tanahabang"/>
     <TextView
             android:id="@+id/tx_substract_or_addition"
             android:layout_alignParentEnd="true"
