@@ -12,19 +12,21 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
+public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
 
     private Context context;
     private int resource_id;
-    private List<StasiunSpinner> items, suggestions, tempItems;
+    private ArrayList<Stasiun_> items, suggestions, tempItems;
 
-    public StasiunSpinnerAdapter (@NonNull Context context, int resource_id, ArrayList<StasiunSpinner> items){
+    public StasiunSpinnerAdapter (@NonNull Context context, int resource_id, ArrayList<Stasiun_> items){
         super(context, resource_id, items);
 
         this.items = items;
@@ -45,12 +47,16 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
                 view = inflater.inflate(resource_id, parent, false);
             }
 
-            StasiunSpinner stasiunSpinner = getItem(position);
+            Stasiun_ stasiun =  getItem(position);
             TextView stasiun_name = (TextView) view.findViewById(R.id.stasiun_name_row);
             ImageView transit = (ImageView) view.findViewById(R.id.is_transit_image);
 
-            transit.setImageResource(stasiunSpinner.getImage_res_id());
-            stasiun_name.setText(stasiunSpinner.getStasiun_name());
+            if(stasiun.getIsTransit() == 1){
+                transit.setImageResource(R.drawable.ic_letter_t);
+            }else{
+                transit.setImageResource(R.drawable.ic_letter_s);
+            }
+            stasiun_name.setText(stasiun.getNama());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -59,7 +65,7 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
 
     @Nullable
     @Override
-    public StasiunSpinner getItem(int position){
+    public Stasiun_ getItem(int position){
         return items.get(position);
     }
 
@@ -69,8 +75,8 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
     }
 
     public String getStasiunIdAtPosition(int position){
-        StasiunSpinner stasiunSpinner = getItem(position);
-        return stasiunSpinner.getStasiun_id();
+        Stasiun_ stasiunSpinner = getItem(position);
+        return stasiunSpinner.getStasiunId();
     }
 
     @Override
@@ -88,16 +94,16 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
 
         @Override
         public CharSequence convertResultToString(Object resultValue){
-            StasiunSpinner stasiunSpinner = (StasiunSpinner) resultValue;
-            return stasiunSpinner.getStasiun_name();
+            Stasiun_ stasiunSpinner = (Stasiun_) resultValue;
+            return stasiunSpinner.getNama();
         }
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             if(constraint != null){
                 suggestions.clear();
-                for (StasiunSpinner stasiunSpinner: tempItems){
-                    if(stasiunSpinner.getStasiun_name().toLowerCase().startsWith(constraint.toString().toLowerCase())){
+                for (Stasiun_ stasiunSpinner: tempItems){
+                    if(stasiunSpinner.getNama().toLowerCase().startsWith(constraint.toString().toLowerCase())){
                         suggestions.add(stasiunSpinner);
                     }
                 }
@@ -112,10 +118,10 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<StasiunSpinner> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            ArrayList<StasiunSpinner> tempValues = (ArrayList<StasiunSpinner>) results.values;
+            ArrayList<Stasiun_> tempValues = (ArrayList<Stasiun_>) results.values;
             if(results != null && results.count > 0){
                 clear();
-                for (StasiunSpinner stasiunObj : tempValues){
+                for (Stasiun_ stasiunObj : tempValues){
                     add(stasiunObj);
                     notifyDataSetChanged();
                 }

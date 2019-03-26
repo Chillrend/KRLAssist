@@ -8,18 +8,32 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.*;
 
 import android.widget.*;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.RealtimePositionAdapter;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
+import com.a4sc11production.krlassist.model.RealtimePos.Data;
+import com.a4sc11production.krlassist.model.RealtimePos.Krl;
+import com.a4sc11production.krlassist.model.RealtimePos.RealtimePos;
 import com.a4sc11production.krlassist.model.RealtimePosition;
+import com.a4sc11production.krlassist.model.Stasiun.Datum;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
+import com.a4sc11production.krlassist.util.APIInterface.PosInterface;
+import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +55,9 @@ public class krl_pos extends Fragment {
     private AutoCompleteTextView stasiunChooser;
     private ListView realtime_pos_listview;
 
-    private ArrayList<StasiunSpinner> StasiunList;
+    private ArrayList<Datum> DatumList;
+    private Stasiun_ StasiunObj;
+    private ArrayList<Stasiun_> stasiunList;
     private StasiunSpinnerAdapter stasiunAdapter;
 
     private ArrayList<RealtimePosition> realtimeList;
@@ -84,6 +100,46 @@ public class krl_pos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        stasiunList = new ArrayList<>();
+
+        KeretaAPICall krlapi = new KeretaAPICall();
+        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
+        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
+        calls.enqueue(new Callback<Stasiun>() {
+            @Override
+            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
+                String display_response = "";
+                try{
+                    Stasiun stasiun = response.body();
+                    stasiunList.clear();
+                    DatumList = stasiun.getData();
+                    for (Datum datum : DatumList) {
+                        StasiunObj = datum.getStasiun();
+                        stasiunList.add(StasiunObj);
+                    }
+
+                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
+
+                    stasiunChooser.setThreshold(1);
+                    stasiunChooser.setAdapter(stasiunAdapter);
+                }catch (Exception E){
+                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
+                    E.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Stasiun> call, Throwable t) {
+                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
+                t.printStackTrace();
+            }
+        });
+
+
+
+
+
         return inflater.inflate(R.layout.fragment_krl_pos, container, false);
     }
     public void onButtonPressed(Uri uri) {
@@ -102,31 +158,55 @@ public class krl_pos extends Fragment {
         cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorPrimary, R.color.colorPrimaryDark);
 
         stasiunChooser = (AutoCompleteTextView) view.findViewById(R.id.realtime_pos_choose_st_autotextview);
-
-        StasiunList = new ArrayList<>();
-
-        StasiunList.add(new StasiunSpinner("CUK", "Cakung", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("CTA", "Citayam", true, R.drawable.ic_letter_t));
-        StasiunList.add(new StasiunSpinner("MRI", "Manggarai", true, R.drawable.ic_letter_t));
-        StasiunList.add(new StasiunSpinner("DP", "Depok", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("BOO", "Bogor", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("DU", "Duri", true, R.drawable.ic_letter_t));
-
-        stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, StasiunList);
-
-        stasiunChooser.setThreshold(1);
-        stasiunChooser.setAdapter(stasiunAdapter);
+        realtime_pos_listview = (ListView) view.findViewById(R.id.realtime_pos_listview);
 
         stasiunChooser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                StasiunSpinner stasiunSpinner = (StasiunSpinner) parent.getItemAtPosition(position);
-                String stasiun_id = stasiunSpinner.getStasiun_id();
-                Toasty.info(getContext(), "Anda Memilih " + stasiun_id, Toast.LENGTH_SHORT, true).show();
+                Stasiun_ stasiunSpinner = (Stasiun_) parent.getItemAtPosition(position);
+                String stasiun_id = stasiunSpinner.getStasiunId();
+
+                KeretaAPICall krlapi = new KeretaAPICall();
+                PosInterface realtimeInterface = krlapi.getClient().create(PosInterface.class);
+                Call<RealtimePos> calls = realtimeInterface.getRealtimePosition("https://api.clude.xyz/rpos/stasiun/" + stasiun_id);
+                calls.enqueue(new Callback<RealtimePos>() {
+                    @Override
+                    public void onResponse(Call<RealtimePos> call, Response<RealtimePos> response) {
+                        String display_response = "";
+                        try{
+
+
+                            RealtimePos rpos = response.body();
+
+                            Data data = rpos.getData();
+
+                            ArrayList<Krl> krlList = new ArrayList<>();
+
+                            krlList.clear();
+
+                            krlList = data.getKrl();
+
+                            krlList = data.getKrl();
+
+                            realtimeAdapter = new RealtimePositionAdapter(krlList, getContext());
+
+                            realtime_pos_listview.setAdapter(realtimeAdapter);
+                        }catch (Exception E){
+                            Log.e("On rPos Call", "can't get realtime position, reason:" + E.toString());
+                            E.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RealtimePos> call, Throwable t) {
+                        Log.e("On rPos Call", "can't get realtime position, reason:" + t.toString());
+                        t.printStackTrace();
+                    }
+                });
             }
         });
 
-        realtime_pos_listview = (ListView) view.findViewById(R.id.realtime_pos_listview);
+
 
         realtimeList = new ArrayList<>();
         realtimeList.add(new RealtimePosition("D1/1270", "Nambo - Angke", "Berangkat Cibinong", "Loop Line", 8));
@@ -137,9 +217,7 @@ public class krl_pos extends Fragment {
         realtimeList.add(new RealtimePosition("1611", "Jakarta Kota - Bogor", "Berangkat Univ. Indonesia", "Central Line", 12));
         realtimeList.add(new RealtimePosition("1271", "Jakarta Kota - Bogor", "Berangkat Lenteng Agung", "Central Line", 8));
 
-        realtimeAdapter = new RealtimePositionAdapter(realtimeList, getContext());
 
-        realtime_pos_listview.setAdapter(realtimeAdapter);
     }
 
 

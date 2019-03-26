@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        android:id="@+id/parent_tx_list_item"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@color/defaultLine"
+        android:padding="10dp"
+        >
+
+    <ImageView
+            android:id="@+id/tx_type_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_minus"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+    <TextView
+            android:id="@+id/tx_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/tx_type_icon"
+            android:fontFamily="sans-serif-light"
+            android:text="Perjalanan"/>
+    <TextView
+            android:id="@+id/tx_at_stasiun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/tx_type_icon"
+            android:layout_below="@id/tx_type"
+            android:textSize="22sp"
+            android:text="Stasiun Cibinong"/>
+    <TextView
+            android:id="@+id/tx_substract_or_addition"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="12sp"
+            android:text="Pengurangan"/>
+
+    <TextView
+            android:id="@+id/tx_amount"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tx_substract_or_addition"
+            android:textSize="22sp"
+            android:text="5000"
+            android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

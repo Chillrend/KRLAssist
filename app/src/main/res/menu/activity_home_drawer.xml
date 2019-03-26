@@ -8,7 +8,7 @@
             android:title="Beranda"/>
     <item
             android:id="@+id/pos_krl"
-            android:icon="@drawable/ic_map_marker_alt"
+            android:icon="@drawable/ic_place_white_24dp"
             android:title="Posisi KRL"/>
     <item
             android:id="@+id/timetable"

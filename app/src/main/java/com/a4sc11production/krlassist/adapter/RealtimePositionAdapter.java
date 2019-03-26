@@ -8,13 +8,15 @@ import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
+import com.a4sc11production.krlassist.model.RealtimePos.Krl;
+import com.a4sc11production.krlassist.model.RealtimePos.RealtimePos;
 import com.a4sc11production.krlassist.model.RealtimePosition;
 
 import java.util.ArrayList;
 
-public class RealtimePositionAdapter extends ArrayAdapter<RealtimePosition> {
+public class RealtimePositionAdapter extends ArrayAdapter<Krl> {
 
-    private ArrayList<RealtimePosition> items;
+    private ArrayList<Krl> items;
     Context ctx;
 
     private static class ViewHolder {
@@ -25,7 +27,7 @@ public class RealtimePositionAdapter extends ArrayAdapter<RealtimePosition> {
         RelativeLayout parent_container;
     }
 
-    public RealtimePositionAdapter(ArrayList<RealtimePosition> data,  Context mCtx){
+    public RealtimePositionAdapter(ArrayList<Krl> data,  Context mCtx){
         super(mCtx, R.layout.realtime_list_item, data);
 
         this.items = data;
@@ -34,7 +36,7 @@ public class RealtimePositionAdapter extends ArrayAdapter<RealtimePosition> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        RealtimePosition rPos = getItem(position);
+        Krl rPos = getItem(position);
 
         ViewHolder viewHolder;
 
@@ -58,12 +60,12 @@ public class RealtimePositionAdapter extends ArrayAdapter<RealtimePosition> {
             result = convertView;
         }
 
-        viewHolder.nomor_ka.setText(rPos.getNomor_ka());
+        viewHolder.nomor_ka.setText(rPos.getTrainNo());
         viewHolder.relasi.setText(rPos.getRelasi());
-        viewHolder.realtime_status.setText(rPos.getRealtime_status());
+        viewHolder.realtime_status.setText(rPos.getSetatus());
         viewHolder.stamformasi.setText(String.valueOf(rPos.getStamformasi()));
 
-        String line = rPos.getLine();
+        String line = rPos.getLineName();
         if(line.equals("Central Line")){
             viewHolder.parent_container.setBackgroundColor(ctx.getResources().getColor(R.color.RedLine));
         }else if(line.equals("Loop Line")){

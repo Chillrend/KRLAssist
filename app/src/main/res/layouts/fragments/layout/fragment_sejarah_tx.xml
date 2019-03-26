@@ -1,43 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context=".fragments.home"
-        android:background="@color/colorPrimary">
+             tools:context=".fragments.sejarah_tx">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            android:weightSum="1"
-            android:orientation="vertical">
-        <RelativeLayout
+            android:orientation="vertical"
+            android:weightSum="1">
+
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0px"
-                android:layout_weight=".2"
-                android:paddingLeft="25dp"
+                android:layout_height="0dp"
+                android:layout_weight=".25"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="25dp"
-                android:paddingRight="25dp"
-                >
+                android:background="@color/colorNormal">
 
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
                     android:fontFamily="sans-serif-light"
-                    android:text="Status Jalur"/>
-        </RelativeLayout>
+                    android:text="Sejarah Transaksi"/>
+        </LinearLayout>
         <ListView
-                android:id="@+id/status_list"
-                android:layout_width="match_parent"
                 android:layout_margin="10dp"
+                android:id="@+id/sejarah_tx_listview"
+                android:layout_width="match_parent"
                 android:divider="@android:color/transparent"
                 android:scrollbars="none"
-                android:dividerHeight="3dp"
+                android:dividerHeight="5dp"
                 android:layout_height="0dp"
-                android:layout_weight=".8"/>
+                android:layout_weight=".75"/>
     </LinearLayout>
 
 </FrameLayout>

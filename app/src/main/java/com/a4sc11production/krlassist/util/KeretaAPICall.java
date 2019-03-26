@@ -15,7 +15,7 @@ public class KeretaAPICall {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.clude.xyz/")
+                .baseUrl("https://api.clude.xyz/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();

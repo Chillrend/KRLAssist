@@ -121,10 +121,10 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         StasiunList.add(new StasiunSpinner("BOO", "Bogor", false, R.drawable.ic_letter_s));
         StasiunList.add(new StasiunSpinner("DU", "Duri", true, R.drawable.ic_letter_t));
 
-        stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, StasiunList);
+//        stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, StasiunList);
 
-        stasiunChooser.setThreshold(1);
-        stasiunChooser.setAdapter(stasiunAdapter);
+//        stasiunChooser.setThreshold(1);
+//        stasiunChooser.setAdapter(stasiunAdapter);
 
         stasiunChooser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
