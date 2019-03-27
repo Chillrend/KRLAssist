@@ -67,6 +67,7 @@ public class GangguanAdapter extends ArrayAdapter<Gangguan> {
 
         if (severity.equals("Normal")) {
             viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorNormal));
+
         } else if (severity.equals("Medium")) {
             viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorWarning));
         } else if (severity.equals("Severe")) {
