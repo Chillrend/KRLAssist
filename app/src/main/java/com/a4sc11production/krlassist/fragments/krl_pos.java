@@ -57,7 +57,6 @@ public class krl_pos extends Fragment {
 
     private ArrayList<Datum> DatumList;
     private Stasiun_ StasiunObj;
-    private ArrayList<Stasiun_> stasiunList;
     private StasiunSpinnerAdapter stasiunAdapter;
 
     private ArrayList<RealtimePosition> realtimeList;
@@ -101,7 +100,7 @@ public class krl_pos extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        stasiunList = new ArrayList<>();
+        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
 
         KeretaAPICall krlapi = new KeretaAPICall();
         StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
@@ -136,10 +135,6 @@ public class krl_pos extends Fragment {
             }
         });
 
-
-
-
-
         return inflater.inflate(R.layout.fragment_krl_pos, container, false);
     }
     public void onButtonPressed(Uri uri) {
@@ -147,6 +142,7 @@ public class krl_pos extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
 
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

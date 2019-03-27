@@ -138,7 +138,6 @@ public class home extends Fragment {
         callGangguanFirst.enqueue(new Callback<GangguanHome>() {
             @Override
             public void onResponse(Call<GangguanHome> call, Response<GangguanHome> response) {
-                gangguan_multistate.setViewState(MultiStateView.VIEW_STATE_LOADING);
 
                 GangguanHome gh = response.body();
                 ArrayList<Datum> datumArrayList = new ArrayList<>();

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,22 @@ import android.widget.*;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
 import com.a4sc11production.krlassist.adapter.TimetableAdapter;
+import com.a4sc11production.krlassist.model.Stasiun.Datum;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
 import com.a4sc11production.krlassist.model.Timetable;
+import com.a4sc11production.krlassist.model.TimetableAP.Data;
+import com.a4sc11production.krlassist.model.TimetableAP.Timetable_;
+import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
+import com.a4sc11production.krlassist.util.APIInterface.TimetableInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,19 +54,28 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     private String mParam1;
     private String mParam2;
 
-    private ArrayList<StasiunSpinner> StasiunList;
+    private ArrayList<Stasiun> stasiunList;
     private String time_1,time_2,stasiun_id;
     private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
     private Date date_now = new Date();
     private boolean isStartTimePicked = true;
 
+    private String train_no, relasi, line_name, dep_time, stasiun;
+
+    private ArrayList<Datum> DatumList;
+
+    private ArrayList<Timetable_> timetable_resp_list;
+
+    private Stasiun_ StasiunObj;
     private StasiunSpinnerAdapter stasiunAdapter;
+
 
     private ArrayList<Timetable> timetableList;
     private TimetableAdapter timetableAdapter;
 
     private AutoCompleteTextView stasiunChooser;
     private EditText time_picker_1, time_picker_2;
+    private ListView lv;
 
     private OnFragmentInteractionListener mListener;
 
@@ -93,7 +114,42 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         date_now = new Date();
-        // Inflate the layout for this fragment
+
+        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
+
+        KeretaAPICall krlapi = new KeretaAPICall();
+        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
+        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
+        calls.enqueue(new Callback<Stasiun>() {
+            @Override
+            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
+                String display_response = "";
+                try{
+                    Stasiun stasiun = response.body();
+                    stasiunList.clear();
+                    DatumList = stasiun.getData();
+                    for (Datum datum : DatumList) {
+                        StasiunObj = datum.getStasiun();
+                        stasiunList.add(StasiunObj);
+                    }
+
+                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
+
+                    stasiunChooser.setThreshold(1);
+                    stasiunChooser.setAdapter(stasiunAdapter);
+                }catch (Exception E){
+                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
+                    E.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Stasiun> call, Throwable t) {
+                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
+                t.printStackTrace();
+            }
+        });
+
         return inflater.inflate(R.layout.fragment_jadwal, container, false);
 
 
@@ -112,44 +168,20 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorPrimary, R.color.colorPrimaryDark);
 
         stasiunChooser = (AutoCompleteTextView) view.findViewById(R.id.timetable_krl_stasiun_autotextview);
-        StasiunList = new ArrayList<>();
-
-        StasiunList.add(new StasiunSpinner("CUK", "Cakung", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("CTA", "Citayam", true, R.drawable.ic_letter_t));
-        StasiunList.add(new StasiunSpinner("MRI", "Manggarai", true, R.drawable.ic_letter_t));
-        StasiunList.add(new StasiunSpinner("DP", "Depok", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("BOO", "Bogor", false, R.drawable.ic_letter_s));
-        StasiunList.add(new StasiunSpinner("DU", "Duri", true, R.drawable.ic_letter_t));
-
-//        stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, StasiunList);
-
-//        stasiunChooser.setThreshold(1);
-//        stasiunChooser.setAdapter(stasiunAdapter);
 
         stasiunChooser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                StasiunSpinner stasiunSpinner = (StasiunSpinner) parent.getItemAtPosition(position);
-                stasiun_id = stasiunSpinner.getStasiun_id();
-                Toasty.info(getContext(), "Anda Memilih " + stasiun_id, Toast.LENGTH_SHORT, true).show();
+                Stasiun_ stasiunSpinner = (Stasiun_) parent.getItemAtPosition(position);
+                stasiun_id = stasiunSpinner.getStasiunId();
+
+                if(evalForm()){
+                    doCallApiRequests(stasiun_id,time_1,time_2);
+                }
             }
         });
 
-        timetableList = new ArrayList<>();
-        timetableList.add(new Timetable("1800-1801","Bogor - Jatinegara", "Manggarai", "Loop Line", "9:22"));
-        timetableList.add(new Timetable("1920","Bogor - Jakarta Kota", "Manggarai", "Central Line", "9:22"));
-        timetableList.add(new Timetable("D1/1270","Jakarta Kota - Bekasi", "Manggarai", "Bekasi Line", "9:22"));
-        timetableList.add(new Timetable("1511","Bogor - Angke", "Manggarai", "Loop Line", "9:22"));
-        timetableList.add(new Timetable("1628","Depok - Angke", "Manggarai", "Loop Line", "9:22"));
-        timetableList.add(new Timetable("1788","Bogor - Jakarta Kota", "Manggarai", "Central Line", "9:22"));
-
-
-
-        ListView lv = (ListView) view.findViewById(R.id.timetable_list);
-        timetableAdapter = new TimetableAdapter(timetableList,getContext());
-        lv.setAdapter(timetableAdapter);
-
-
+        lv = (ListView) view.findViewById(R.id.timetable_list);
 
         time_picker_1 = (EditText) view.findViewById(R.id.time_picker_1);
         time_picker_2 = (EditText) view.findViewById(R.id.time_picker_2);
@@ -216,9 +248,14 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     @Override
     public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute){
         if(isStartTimePicked){
+            time_1 = hourOfDay + ":" + minute;
             time_picker_1.setText(hourOfDay + ":" + minute);
         }else{
+            time_2 = hourOfDay + ":" + minute;
             time_picker_2.setText(hourOfDay + ":" + minute);
+            if(evalForm()){
+                doCallApiRequests(stasiun_id,time_1,time_2);
+            }
         }
     }
 
@@ -248,6 +285,58 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         mListener = null;
 
         date_now = new Date();
+    }
+
+    public boolean evalForm(){
+        if(!stasiun_id.equals("") && !stasiun_id.equals(null) && !time_1.equals("") && !time_1.equals(null) && !time_2.equals("") && !time_2.equals(null)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public void doCallApiRequests(String st_id, String time_range1, String time_range2){
+        ArrayList<com.a4sc11production.krlassist.model.TimetableAP.Timetable> stasiunList = new ArrayList<>();
+
+
+        KeretaAPICall krlapi = new KeretaAPICall();
+        TimetableInterface timetableInterface = krlapi.getClient().create(TimetableInterface.class);
+        Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> calls = timetableInterface.getJadwal("https://api.clude.xyz/timetable/getrange/"+ st_id +"/from/"+ time_range1 +"/to/" + time_range2);
+        calls.enqueue(new Callback<com.a4sc11production.krlassist.model.TimetableAP.Timetable>() {
+            @Override
+            public void onResponse(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Response<com.a4sc11production.krlassist.model.TimetableAP.Timetable> response) {
+                String display_response = "";
+                try{
+                    com.a4sc11production.krlassist.model.TimetableAP.Timetable timetable = response.body();
+                    timetableList = new ArrayList<>();
+                    timetableList.clear();
+                    Data data = timetable.getData();
+                    timetable_resp_list = data.getTimetable();
+                    for (Timetable_ timetables : timetable_resp_list) {
+                        train_no = timetables.getTrainNo();
+                        relasi = timetables.getRelasi();
+                        stasiun = timetables.getStasiun();
+                        line_name = timetables.getLineName();
+                        dep_time = timetables.getDepTime().substring(0,5);
+
+                        timetableList.add(new Timetable(train_no,relasi,stasiun,line_name,dep_time));
+                    }
+
+                    timetableAdapter = new TimetableAdapter(timetableList,getContext());
+                    lv.setAdapter(timetableAdapter);
+
+                }catch (Exception E){
+                    Log.e("On Timetable Call", "can't get Timetable, reason:" + E.toString());
+                    E.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Throwable t) {
+                Log.e("On Timetable Call", "can't get Timetable, reason:" + t.toString());
+                t.printStackTrace();
+            }
+        });
     }
 
     /**
