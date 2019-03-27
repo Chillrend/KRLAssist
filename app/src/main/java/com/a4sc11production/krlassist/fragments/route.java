@@ -18,14 +18,30 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.MapInfoWindowAdapter;
+import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
+import com.a4sc11production.krlassist.model.Line.Line;
+import com.a4sc11production.krlassist.model.Line.Result;
+import com.a4sc11production.krlassist.model.Stasiun.Datum;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
+import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunTemp;
+import com.a4sc11production.krlassist.util.APIInterface.RouteInterface;
+import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.DirectionsJSONParser;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import org.json.JSONObject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -51,9 +67,11 @@ public class route extends Fragment {
     private String mParam1;
     private String mParam2;
     private ArrayList<StasiunTemp> stasiunTemps;
+    private ArrayList<Result> result;
 
     MapView mMapView;
     private GoogleMap googleMap;
+    private Spinner spinner;
 
     private OnFragmentInteractionListener mListener;
 
@@ -93,6 +111,26 @@ public class route extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        KeretaAPICall krlapi = new KeretaAPICall();
+        RouteInterface routeInterface = krlapi.getClient().create(RouteInterface.class);
+        Call<Line> calls = routeInterface.getLine("https://api.clude.xyz/line");
+        calls .enqueue(new Callback<Line>() {
+            @Override
+            public void onResponse(Call<Line> call, Response<Line> response) {
+                Line layn = response.body();
+                result = layn.getResult();
+                ArrayAdapter<Result> adapter = new ArrayAdapter<Result>(getContext(), R.layout.spinner_selected_item, result);
+                adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+
+                spinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<Line> call, Throwable t) {
+                Log.e("On Line Call", "Can't get Line, reason : " + t.toString());
+                t.printStackTrace();
+            }
+        });
 
         return inflater.inflate(R.layout.fragment_route, container, false);
     }
@@ -102,40 +140,93 @@ public class route extends Fragment {
         ActionBar abar = (ActionBar) ((AppCompatActivity) getActivity()).getSupportActionBar();
         Window window = getActivity().getWindow();
 
+        spinner = view.findViewById(R.id.route_spinner);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int white = Color.parseColor("#ffffff");
+                ((TextView) parent.getChildAt(0)).setTextColor(white);
+                Result res = result.get(position);
+
+                String line_name = res.getLineName();
+
+                KeretaAPICall krlapi = new KeretaAPICall();
+                StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
+                Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
+                calls.enqueue(new Callback<Stasiun>() {
+                    @Override
+                    public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
+                        String display_response = "";
+                        googleMap.clear();
+                        Stasiun stat = response.body();
+
+                        ArrayList<Datum> data = stat.getData();
+                        for (Datum dat : data) {
+                            Stasiun_ stasiun_ = dat.getStasiun();
+                            ArrayList<String> lineArr = dat.getLinenamearr();
+                            if(lineArr.contains(line_name)){
+                                stasiunTemps = new ArrayList<>();
+                                stasiunTemps.clear();
+                                Boolean isTransit;
+                                if(stasiun_.getIsTransit() == 0){
+                                    isTransit = false;
+                                }else{
+                                    isTransit = true;
+                                }
+                                stasiunTemps.add(new StasiunTemp(stasiun_.getStasiunId(), stasiun_.getNama(),
+                                        Double.parseDouble(stasiun_.getLat()), Double.parseDouble(stasiun_.getLng()),isTransit, lineArr));
+
+                                for(StasiunTemp temp : stasiunTemps){
+                                    LatLng pos = new LatLng(temp.getLat(), temp.getLng());
+
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(pos);
+
+                                    Marker m = googleMap.addMarker(markerOptions);
+                                    m.setTag(temp);
+                                }
+                                MapInfoWindowAdapter miwa = new MapInfoWindowAdapter(getContext());
+                                googleMap.setInfoWindowAdapter(miwa);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Stasiun> call, Throwable t) {
+                        Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
+                        t.printStackTrace();
+                    }
+                });
+
+                String lat1,lng1,lat2,lng2;
+                lat1 = res.getLat1();
+                lng1 = res.getLng1();
+                lat2 = res.getLat2();
+                lng2 = res.getLng2();
+
+                LatLng term1 = new LatLng(Double.parseDouble(lat1),Double.parseDouble(lng1));
+                LatLng term2 = new LatLng(Double.parseDouble(lat2),Double.parseDouble(lng2));
+
+                String uri = buildDirectionURL(term1,term2);
+                DownloadDirection downloadDirection = new DownloadDirection();
+                downloadDirection.execute(uri);
+
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(term1, 10));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
         cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorPrimary,R.color.colorPrimaryDark);
-
-        stasiunTemps = new ArrayList<>();
-        List<String> line = new ArrayList<>();
-        line.add("Loop Line");
-        line.add("Central Line");
-        stasiunTemps.add(new StasiunTemp("BOO", "Bogor", -6.595684, 106.790417, false, line));
-
-        line.clear();
-        line.add("Loop Line");
-        line.add("Central Line");
-        stasiunTemps.add(new StasiunTemp("CLT", "Cilebut", -6.530543, 106.800566, false, line));
-
-        line.clear();
-        line.add("Loop Line");
-        line.add("Central Line");
-        stasiunTemps.add(new StasiunTemp("BJD", "Bojong Gede", -6.493245, 106.794896, false, line));
-
-        line.clear();
-        line.add("Loop Line");
-        line.add("Central Line");
-        stasiunTemps.add(new StasiunTemp("CTA", "Citayam", -6.448799, 106.802486, true, line));
-
-        line.clear();
-        line.add("Loop Line");
-        line.add("Central Line");
-        stasiunTemps.add(new StasiunTemp("DP", "Depok", -6.404935, 106.817253, true, line));
 
         mMapView = (MapView) view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
-
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -152,26 +243,7 @@ public class route extends Fragment {
                 LatLng terminus1 = new LatLng(-6.595684,106.790417);
                 LatLng terminus2 = new LatLng(-6.13757,106.814633);
 
-                for(StasiunTemp temp : stasiunTemps){
-                    LatLng pos = new LatLng(temp.getLat(), temp.getLng());
 
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(pos);
-
-                    Marker m = mMap.addMarker(markerOptions);
-                    m.setTag(temp);
-                }
-                MapInfoWindowAdapter miwa = new MapInfoWindowAdapter(getContext());
-                mMap.setInfoWindowAdapter(miwa);
-
-                String uri = buildDirectionURL(terminus1,terminus2);
-
-                DownloadDirection downloadDirection = new DownloadDirection();
-                downloadDirection.execute(uri);
-
-
-
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(terminus1, 10));
             }
         });
     }
