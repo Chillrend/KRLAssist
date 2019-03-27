@@ -18,9 +18,18 @@ import android.widget.ListView;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.GangguanAdapter;
 import com.a4sc11production.krlassist.model.Gangguan;
+import com.a4sc11production.krlassist.model.GangguanHome.GangguanHome;
+import com.a4sc11production.krlassist.model.GangguanList.Affected;
+import com.a4sc11production.krlassist.model.GangguanList.Datum;
+import com.a4sc11production.krlassist.model.GangguanList.GangguanList;
+import com.a4sc11production.krlassist.util.APIInterface.GangguanInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.DialogShow;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 
@@ -91,18 +100,45 @@ public class line_status extends Fragment {
         ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
         cbar.changeStatusActionBarColorFromFragment(window, abar, R.color.colorPrimary, R.color.colorPrimaryDark);
 
+        ListView lv = view.findViewById(R.id.status_list);
 
         gangguanList = new ArrayList<>();
-        gangguanList.add(new Gangguan("Central Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai","Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Loop Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai", "Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Bekasi Line", "Pergantian Masuk", "Pergantian Jalur Masuk di Stasiun Manggarai","Stasiun Manggarai", "Medium"));
-        gangguanList.add(new Gangguan("Tanjung Priok Line", "Perjalanan Normal","Perjalanan Normal", "None", "Normal"));
-        gangguanList.add(new Gangguan("Rangkasbitung Line", "Rel Patah","Rel Patah diantara Lintas RK - THB, Alur lintas hulu hilir tidak dapat dilewati" ,"Stasiun Rangkasbitung", "Severe"));
-        gangguanList.add(new Gangguan("Tangerang Line", "Perjalanan Normal","", "None", "Normal"));
 
-        ListView lv = view.findViewById(R.id.status_list);
-        gangguanAdapter = new GangguanAdapter(gangguanList,getContext());
-        lv.setAdapter(gangguanAdapter);
+        KeretaAPICall krlapi = new KeretaAPICall();
+        GangguanInterface gangguanInterface = krlapi.getClient().create(GangguanInterface.class);
+        Call<GangguanList> getList = gangguanInterface.getGangguanList("https://api.clude.xyz/gangguan/");
+        getList.enqueue(new Callback<GangguanList>() {
+            @Override
+            public void onResponse(Call<GangguanList> call, Response<GangguanList> response) {
+                GangguanList gl = response.body();
+
+                ArrayList<Datum> datumList = gl.getData();
+                for (Datum datum : datumList) {
+                    com.a4sc11production.krlassist.model.GangguanList.Gangguan gangguan = datum.getGangguan();
+                    ArrayList<Affected> affecteds = datum.getAffected();
+                    String line_name, stasiun_nearest, short_desc, long_desc, severity;
+                    int size = affecteds.size();
+                    for (int i = 0; i<size; i++) {
+                        short_desc = gangguan.getShortDesc();
+                        long_desc = gangguan.getLongDesc();
+                        severity = gangguan.getSeverity();
+                        stasiun_nearest = gangguan.getStasiunNearest();
+                        line_name = affecteds.get(i).getLineName();
+                        gangguanList.add(new Gangguan(line_name,short_desc,long_desc,stasiun_nearest,severity));
+                    }
+                }
+
+                gangguanAdapter = new GangguanAdapter(gangguanList,getContext());
+                lv.setAdapter(gangguanAdapter);
+
+            }
+
+            @Override
+            public void onFailure(Call<GangguanList> call, Throwable t) {
+
+            }
+        });
+
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
