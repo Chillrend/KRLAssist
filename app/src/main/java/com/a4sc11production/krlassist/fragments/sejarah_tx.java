@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,15 @@ import android.view.Window;
 import android.widget.ListView;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.TxAdapter;
+import com.a4sc11production.krlassist.model.KMT.TxHistory.Result;
+import com.a4sc11production.krlassist.model.KMT.TxHistory.TxHistory;
 import com.a4sc11production.krlassist.model.TxTemporary;
+import com.a4sc11production.krlassist.util.APIInterface.KMTInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
+import com.a4sc11production.krlassist.util.KeretaAPICall;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 
@@ -35,8 +43,12 @@ public class sejarah_tx extends Fragment {
 
     private String mParam1;
     private String mParam2;
-
+    private String UIDs;
     private OnFragmentInteractionListener mListener;
+
+    private ListView lv;
+
+    private ArrayList<TxTemporary> temporarieslist;
 
     public sejarah_tx() {
         // Required empty public constructor
@@ -72,27 +84,57 @@ public class sejarah_tx extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Bundle bundle = this.getArguments();
+
+        try{
+            if(bundle != null){
+                UIDs = bundle.getString("UID", null);
+            }else{
+                throw new NullPointerException();
+            }
+        }catch (NullPointerException e){
+            Log.e("On Bundle Get", "Can't get UID From nfc_kmt");
+            e.printStackTrace();
+        }
+
+
+        KeretaAPICall krlapi = new KeretaAPICall();
+
+        KMTInterface kmtInterface = krlapi.getClient().create(KMTInterface.class);
+        String urls = "https://api.clude.xyz/kmt/history/" + UIDs;
+        Call<TxHistory> calls = kmtInterface.getKMTHistory(urls);
+        calls.enqueue(new Callback<TxHistory>() {
+            @Override
+            public void onResponse(Call<TxHistory> call, Response<TxHistory> response) {
+                TxHistory txHistory = response.body();
+                temporarieslist = new ArrayList<>();
+                temporarieslist.clear();
+
+                ArrayList<Result> results = txHistory.getResult();
+                for (Result res : results) {
+                    temporarieslist.add(new TxTemporary(res.getTransactionType(),res.getStasiun(),res.getAmount()));
+                }
+
+                TxAdapter txAdapter = new TxAdapter(temporarieslist, getContext());
+                lv.setAdapter(txAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<TxHistory> call, Throwable t) {
+
+            }
+        });
+
         return inflater.inflate(R.layout.fragment_sejarah_tx, container, false);
     }
 
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ArrayList<TxTemporary> temporarieslist = new ArrayList<>();
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Tanahabang", 5000));
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cibinong", 3000));
-        temporarieslist.add(new TxTemporary("ADDITION_STAT", "Cibinong", 50000));
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cikini", 5000));
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Cibinong", 5000));
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Tambun", 7000));
-        temporarieslist.add(new TxTemporary("ADDITION_STAT", "Tambun", 10000));
-        temporarieslist.add(new TxTemporary("DEDUCTION_TRAVEL", "Depok", 8000));
 
-        TxAdapter txAdapter = new TxAdapter(temporarieslist, getContext());
 
-        ListView lv = view.findViewById(R.id.sejarah_tx_listview);
 
-        lv.setAdapter(txAdapter);
+        lv = view.findViewById(R.id.sejarah_tx_listview);
 
         Window window = getActivity().getWindow();
         ActionBar abar = (ActionBar) ((AppCompatActivity) getActivity()).getSupportActionBar();

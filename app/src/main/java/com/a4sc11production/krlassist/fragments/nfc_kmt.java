@@ -51,6 +51,7 @@ public class nfc_kmt extends Fragment {
 
     private String mParam1;
     private String mParam2;
+    private String UID;
 
     private OnFragmentInteractionListener mListener;
 
@@ -125,7 +126,10 @@ public class nfc_kmt extends Fragment {
         tx_history_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putString("UID", UID);
                 Fragment fragment = new sejarah_tx();
+                fragment.setArguments(bundle);
                 ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "SEJARAH_TX_FRAGMENT");
             }
         });
@@ -137,7 +141,9 @@ public class nfc_kmt extends Fragment {
         View v = getView();
         TextView kmtBals = v.findViewById(R.id.kmt_bal_amount);
         mMultiStateView.setViewState(MultiStateView.VIEW_STATE_EMPTY);
+        UID = UIDS;
         kmt_uid_text.setText(UIDS);
+
         KeretaAPICall krlapi = new KeretaAPICall();
 
         kmtInterface = krlapi.getClient().create(KMTInterface.class);
