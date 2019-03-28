@@ -1,6 +1,7 @@
 package com.a4sc11production.krlassist.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,6 +52,8 @@ public class krl_pos extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    public final static double AVERAGE_RADIUS_OF_EARTH = 6371;
+
     private String[] testingAutoComplete = {"Bleh", "Blah", "Bloh", "Blih", "Bluh"};
     private AutoCompleteTextView stasiunChooser;
     private ListView realtime_pos_listview;
@@ -58,6 +61,8 @@ public class krl_pos extends Fragment {
     private ArrayList<Datum> DatumList;
     private Stasiun_ StasiunObj;
     private StasiunSpinnerAdapter stasiunAdapter;
+    private String st_id;
+    private int distancesz = 99999;
 
     private ArrayList<RealtimePosition> realtimeList;
     private RealtimePositionAdapter realtimeAdapter;
@@ -118,6 +123,21 @@ public class krl_pos extends Fragment {
                         stasiunList.add(StasiunObj);
                     }
 
+                    SharedPreferences spref = getActivity().getSharedPreferences("LOCATION_STORAGE", Context.MODE_PRIVATE);
+                    Double lat = Double.parseDouble(spref.getString("lat", ""));
+                    Double lng = Double.parseDouble(spref.getString("lng", ""));
+
+                    for (Stasiun_ st:stasiunList) {
+                        int distances = calculateDistance(lat,lng,Double.parseDouble(st.getLat()),Double.parseDouble(st.getLng()));
+                        if(distancesz > distances) {
+                            stasiunChooser.setText(st.getNama());
+                            st_id = st.getStasiunId();
+                            distancesz = distances;
+                        }
+                    }
+                    Log.d("ST_ID = ", st_id);
+                    doCallApi(st_id);
+
                     stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
 
                     stasiunChooser.setThreshold(1);
@@ -141,6 +161,62 @@ public class krl_pos extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    public int calculateDistance(double userLat, double userLng, double venueLat, double venueLng) {
+
+        double latDistance = Math.toRadians(userLat - venueLat);
+        double lngDistance = Math.toRadians(userLng - venueLng);
+
+        double a = (Math.sin(latDistance / 2) * Math.sin(latDistance / 2)) +
+                (Math.cos(Math.toRadians(userLat))) *
+                        (Math.cos(Math.toRadians(venueLat))) *
+                        (Math.sin(lngDistance / 2)) *
+                        (Math.sin(lngDistance / 2));
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return (int) (Math.round(AVERAGE_RADIUS_OF_EARTH * c));
+
+    }
+    public void doCallApi(String stasiuns){
+        KeretaAPICall krlapi = new KeretaAPICall();
+        PosInterface realtimeInterface = krlapi.getClient().create(PosInterface.class);
+        Call<RealtimePos> calls = realtimeInterface.getRealtimePosition("https://api.clude.xyz/rpos/stasiun/" + stasiuns);
+        calls.enqueue(new Callback<RealtimePos>() {
+            @Override
+            public void onResponse(Call<RealtimePos> call, Response<RealtimePos> response) {
+                String display_response = "";
+                try{
+
+
+                    RealtimePos rpos = response.body();
+
+                    Data data = rpos.getData();
+
+                    ArrayList<Krl> krlList = new ArrayList<>();
+
+                    krlList.clear();
+
+                    krlList = data.getKrl();
+
+                    krlList = data.getKrl();
+
+                    realtimeAdapter = new RealtimePositionAdapter(krlList, getContext());
+
+                    realtime_pos_listview.setAdapter(realtimeAdapter);
+                }catch (Exception E){
+                    Log.e("On rPos Call", "can't get realtime position, reason:" + E.toString());
+                    E.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RealtimePos> call, Throwable t) {
+                Log.e("On rPos Call", "can't get realtime position, reason:" + t.toString());
+                t.printStackTrace();
+            }
+        });
     }
 
 
