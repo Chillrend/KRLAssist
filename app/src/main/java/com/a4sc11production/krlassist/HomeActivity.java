@@ -256,13 +256,18 @@ public class HomeActivity extends AppCompatActivity
     static String bin2hex(byte[] data) {
         return String.format("%0" + (data.length * 2) + "X", new BigInteger(1,data));
     }
-
-    @Override
+         @Override
     public void onBackPressed() {
+        home homes = (home) getSupportFragmentManager().findFragmentByTag("HOME_FRAGMENT");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if (homes != null && homes.isVisible()){
+
+        }
+        else{
+
             super.onBackPressed();
         }
     }
@@ -310,8 +315,9 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.check_card) {
             Fragment fragment = new nfc_kmt();
             displaySpecificFragment(fragment,"NFC_FRAGMENT");
-        } else if (id == R.id.settings) {
-
+        } else if (id == R.id.info) {
+            Intent i = new Intent(HomeActivity.this, about.class);
+            startActivity(i);
         } else if (id == R.id.home) {
             Fragment fragment = new home();
             displaySpecificFragment(fragment,"HOME_FRAGMENT");

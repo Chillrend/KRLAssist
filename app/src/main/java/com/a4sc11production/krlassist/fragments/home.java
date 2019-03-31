@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.HomeActivity;
 import com.a4sc11production.krlassist.R;
@@ -59,7 +60,8 @@ public class home extends Fragment {
     TextView gangguan_normal_text;
     ImageView gangguan_icon, icon_gangguan_line_1, icon_gangguan_line_2, icon_gangguan_line_3;
     MultiStateView gangguan_multistate;
-    LinearLayout line_container_1, line_container_2, line_container_3;
+    LinearLayout line_container_1, line_container_2, line_container_3, btn_info_lanjut;
+    LinearLayout btn_1,btn_2,btn_3;
 
     Window window;
     ActionBar abar;
@@ -110,6 +112,34 @@ public class home extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE);
         String default_line = sharedPreferences.getString("def_line", "1");
 
+        btn_1 = (LinearLayout) view.findViewById(R.id.btn_1);
+        btn_2 = (LinearLayout) view.findViewById(R.id.btn_2);
+        btn_3 = (LinearLayout) view.findViewById(R.id.btn_3);
+
+        btn_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new krl_pos();
+                ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "REALTIME_POS_FRAGMENT");
+            }
+        });
+
+        btn_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new jadwal();
+                ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "TIMETABLE_FRAGMENT");
+            }
+        });
+
+        btn_3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = new nfc_kmt();
+                ((HomeActivity) getActivity()).displaySpecificFragment(fragment, "NFC_KMT_FRAGMENT");
+            }
+        });
+
         gangguan_short_desc = (TextView) view.findViewById(R.id.gangguan_short_desc);
         gangguan_affected_stasiun = (TextView) view.findViewById(R.id.gangguan_affected_station);
         nama_line_gangguan_1 = (TextView) view.findViewById(R.id.nama_line_gangguan_1);
@@ -125,6 +155,7 @@ public class home extends Fragment {
         line_container_1 = (LinearLayout) view.findViewById(R.id.line_container_1);
         line_container_2 = (LinearLayout) view.findViewById(R.id.line_container_2);
         line_container_3 = (LinearLayout) view.findViewById(R.id.line_container_3);
+        btn_info_lanjut = (LinearLayout) view.findViewById(R.id.btn_info_lanjut);
 
         gangguan_multistate.setViewState(MultiStateView.VIEW_STATE_LOADING);
 
@@ -161,37 +192,44 @@ public class home extends Fragment {
                     @Override
                     public void onResponse(Call<GangguanLine> call, Response<GangguanLine> response) {
                         GangguanLine gl = response.body();
-                        ArrayList<com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum> afterGangguanList = new ArrayList<>();
-                        afterGangguanList = gl.getData();
-                        ArrayList<String> line_affected = new ArrayList<>();
+                        try{
+                            ArrayList<com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum> afterGangguanList = new ArrayList<>();
+                            afterGangguanList = gl.getData();
+                            ArrayList<String> line_affected = new ArrayList<>();
 
-                        for (com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum datum : afterGangguanList) {
-                            line_affected = datum.getLinename();
+                            for (com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum datum : afterGangguanList) {
+                                line_affected = datum.getLinename();
+                            }
+
+                            setLine(line_affected);
+
+                            if(severity.equals("Normal")){
+                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorNormal, R.color.colorNormalDark);
+                                gangguan_icon.setImageResource(R.drawable.ic_done_all_black_24dp);
+                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorNormal));
+
+                                gangguan_affected_stasiun.setText(line_affected.get(0));
+
+                                line_container_1.setVisibility(View.GONE);
+                                line_container_2.setVisibility(View.GONE);
+                                line_container_3.setVisibility(View.GONE);
+                                jalurt_terganggu_static.setVisibility(View.GONE);
+                                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) btn_info_lanjut.getLayoutParams();
+                                params.addRule(RelativeLayout.BELOW, R.id.gangguan_normal_text);
+                                gangguan_normal_text.setVisibility(View.VISIBLE);
+                            }else if(severity.equals("Medium")){
+                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorWarning, R.color.colorWarningDark);
+                                gangguan_icon.setImageResource(R.drawable.ic_warning);
+                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorWarning));
+                            }else if(severity.equals("Severe")){
+                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorDanger, R.color.colorDangerDark);
+                                gangguan_icon.setImageResource(R.drawable.ic_danger);
+                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorDanger));
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
                         }
 
-                        setLine(line_affected);
-
-                        if(severity.equals("Normal")){
-                            cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorNormal, R.color.colorNormalDark);
-                            gangguan_icon.setImageResource(R.drawable.ic_done_all_black_24dp);
-                            gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorNormal));
-
-                            gangguan_affected_stasiun.setText(line_affected.get(0));
-
-                            line_container_1.setVisibility(View.GONE);
-                            line_container_2.setVisibility(View.GONE);
-                            line_container_3.setVisibility(View.GONE);
-                            jalurt_terganggu_static.setVisibility(View.GONE);
-                            gangguan_normal_text.setVisibility(View.VISIBLE);
-                        }else if(severity.equals("Medium")){
-                            cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorWarning, R.color.colorWarningDark);
-                            gangguan_icon.setImageResource(R.drawable.ic_warning);
-                            gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorWarning));
-                        }else if(severity.equals("Severe")){
-                            cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorDanger, R.color.colorDangerDark);
-                            gangguan_icon.setImageResource(R.drawable.ic_danger);
-                            gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorDanger));
-                        }
                     }
 
                     @Override

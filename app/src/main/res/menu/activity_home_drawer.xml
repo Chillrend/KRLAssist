@@ -27,9 +27,9 @@
             android:icon="@drawable/ic_credit_card"
             android:title="Cek KMT"/>
     <item
-            android:id="@+id/settings"
-            android:icon="@drawable/ic_cogs"
-            android:title="Pengaturan"/>
+            android:id="@+id/info"
+            android:icon="@drawable/ic_info_circle"
+            android:title="Tentang"/>
 
 
 </menu>
