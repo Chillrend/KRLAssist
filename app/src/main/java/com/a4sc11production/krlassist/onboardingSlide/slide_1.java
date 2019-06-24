@@ -130,7 +130,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(false);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "4");
+                editor.putString("def_line", "Loop Line");
                 editor.commit();
             }
         });
@@ -145,7 +145,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(false);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "1");
+                editor.putString("def_line", "Red Line");
                 editor.commit();
             }
         });
@@ -160,7 +160,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(false);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "13");
+                editor.putString("def_line", "Bekasi Line");
                 editor.commit();
             }
         });
@@ -175,7 +175,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(false);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "14");
+                editor.putString("def_line", "Tangerang Line");
                 editor.commit();
             }
         });
@@ -190,7 +190,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(true);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "11");
+                editor.putString("def_line", "Rangkasbitung Line");
                 editor.commit();
             }
         });

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import com.a4sc11production.krlassist.HomeActivity;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.GangguanLine;
@@ -28,6 +30,12 @@ import com.a4sc11production.krlassist.model.RealtimePos.Line;
 import com.a4sc11production.krlassist.util.APIInterface.GangguanInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.kennyc.view.MultiStateView;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,15 +61,17 @@ public class home extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    String short_desc,stasiun_nearest,severity;
-    Integer gangguan_id;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    TextView gangguan_short_desc, gangguan_affected_stasiun, nama_line_gangguan_1, nama_line_gangguan_2, nama_line_gangguan_3, jalurt_terganggu_static;
-    TextView gangguan_normal_text;
-    ImageView gangguan_icon, icon_gangguan_line_1, icon_gangguan_line_2, icon_gangguan_line_3;
-    MultiStateView gangguan_multistate;
-    LinearLayout line_container_1, line_container_2, line_container_3, btn_info_lanjut;
-    LinearLayout btn_1,btn_2,btn_3;
+    private String short_desc,stasiun_nearest,severity;
+    private Integer gangguan_id;
+
+    private TextView gangguan_short_desc, gangguan_affected_stasiun, nama_line_gangguan_1, nama_line_gangguan_2, nama_line_gangguan_3, jalurt_terganggu_static;
+    private TextView gangguan_normal_text;
+    private ImageView gangguan_icon, icon_gangguan_line_1, icon_gangguan_line_2, icon_gangguan_line_3;
+    private MultiStateView gangguan_multistate;
+    private LinearLayout line_container_1, line_container_2, line_container_3, btn_info_lanjut;
+    private LinearLayout btn_1,btn_2,btn_3;
 
     Window window;
     ActionBar abar;
@@ -108,9 +118,6 @@ public class home extends Fragment {
     }
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE);
-        String default_line = sharedPreferences.getString("def_line", "1");
 
         btn_1 = (LinearLayout) view.findViewById(R.id.btn_1);
         btn_2 = (LinearLayout) view.findViewById(R.id.btn_2);
@@ -162,6 +169,19 @@ public class home extends Fragment {
         window = getActivity().getWindow();
         abar = (ActionBar) ((AppCompatActivity) getActivity()).getSupportActionBar();
         ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
+
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE);
+        String default_line = sharedPreferences.getString("def_line", "Central Line");
+
+        DocumentReference docRef = db.collection("gangguan").document(default_line);
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                com.a4sc11production.krlassist.pojo.Gangguan gangguan = documentSnapshot.toObject(com.a4sc11production.krlassist.pojo.Gangguan.class);
+
+
+            }
+        });
 
         KeretaAPICall krlapi = new KeretaAPICall();
         GangguanInterface gangguanInterface = krlapi.getClient().create(GangguanInterface.class);
@@ -248,8 +268,7 @@ public class home extends Fragment {
             }
         });
 
-        LinearLayout info_lanjut_btn = (LinearLayout) view.findViewById(R.id.btn_info_lanjut);
-        info_lanjut_btn.setOnClickListener(new View.OnClickListener() {
+        btn_info_lanjut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment fragment = new line_status();
