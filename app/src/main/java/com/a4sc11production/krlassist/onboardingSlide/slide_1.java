@@ -145,7 +145,7 @@ public class slide_1 extends Fragment implements ISlideBackgroundColorHolder, IS
                 rangkasbitung_line.setSelected(false);
 
                 SharedPreferences.Editor editor = getActivity().getSharedPreferences("DEFAULT_LINE", Context.MODE_PRIVATE).edit();
-                editor.putString("def_line", "Red Line");
+                editor.putString("def_line", "Central Line");
                 editor.commit();
             }
         });

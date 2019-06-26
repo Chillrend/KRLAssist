@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -28,6 +29,12 @@ import com.a4sc11production.krlassist.util.APIInterface.PosInterface;
 import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +42,7 @@ import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +61,9 @@ public class krl_pos extends Fragment {
     private String mParam2;
 
     public final static double AVERAGE_RADIUS_OF_EARTH = 6371;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList;
 
     private String[] testingAutoComplete = {"Bleh", "Blah", "Bloh", "Blih", "Bluh"};
     private AutoCompleteTextView stasiunChooser;
@@ -105,53 +116,95 @@ public class krl_pos extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
+//        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
-        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
-        calls.enqueue(new Callback<Stasiun>() {
+//        KeretaAPICall krlapi = new KeretaAPICall();
+//        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
+//        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
+//        calls.enqueue(new Callback<Stasiun>() {
+//            @Override
+//            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
+//                String display_response = "";
+//                try{
+//                    Stasiun stasiun = response.body();
+//                    stasiunList.clear();
+//                    DatumList = stasiun.getData();
+//                    for (Datum datum : DatumList) {
+//                        StasiunObj = datum.getStasiun();
+//                        stasiunList.add(StasiunObj);
+//                    }
+//
+//                    SharedPreferences spref = getActivity().getSharedPreferences("LOCATION_STORAGE", Context.MODE_PRIVATE);
+//                    Double lat = Double.parseDouble(spref.getString("lat", ""));
+//                    Double lng = Double.parseDouble(spref.getString("lng", ""));
+//
+//                    for (Stasiun_ st:stasiunList) {
+//                        int distances = calculateDistance(lat,lng,Double.parseDouble(st.getLat()),Double.parseDouble(st.getLng()));
+//                        if(distancesz > distances) {
+//                            stasiunChooser.setText(st.getNama());
+//                            st_id = st.getStasiunId();
+//                            distancesz = distances;
+//                        }
+//                    }
+//                    Log.d("ST_ID = ", st_id);
+//                    doCallApi(st_id);
+//
+//                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
+//
+//                    stasiunChooser.setThreshold(1);
+//                    stasiunChooser.setAdapter(stasiunAdapter);
+//                }catch (Exception E){
+//                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
+//                    E.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Stasiun> call, Throwable t) {
+//                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
+//                t.printStackTrace();
+//            }
+//        });
+
+        CollectionReference colRef = db.collection("stasiun");
+
+        colRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
-                String display_response = "";
-                try{
-                    Stasiun stasiun = response.body();
-                    stasiunList.clear();
-                    DatumList = stasiun.getData();
-                    for (Datum datum : DatumList) {
-                        StasiunObj = datum.getStasiun();
-                        stasiunList.add(StasiunObj);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+//                        Log.d("TEST DATA FROM FBASE", document.getId() + "=>" + document.getData());
+
+                        Map<String,Object> data = document.getData();
+
+                        String st_name, kode;
+                        Double latitude, longitude;
+                        ArrayList<String> line_served, neighbors;
+                        boolean transit;
+
+                        st_name = document.getId();
+                        kode = data.get("kode").toString();
+                        latitude = Double.valueOf(data.get("latitude").toString());
+                        longitude = Double.valueOf(data.get("longitude").toString());
+
+                        line_served = (ArrayList<String>)data.get("line-served");
+                        neighbors = (ArrayList<String>)data.get("neighbors");
+
+
+                        transit = (Boolean) data.get("transit");
+
+
+                        stList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
                     }
 
-                    SharedPreferences spref = getActivity().getSharedPreferences("LOCATION_STORAGE", Context.MODE_PRIVATE);
-                    Double lat = Double.parseDouble(spref.getString("lat", ""));
-                    Double lng = Double.parseDouble(spref.getString("lng", ""));
-
-                    for (Stasiun_ st:stasiunList) {
-                        int distances = calculateDistance(lat,lng,Double.parseDouble(st.getLat()),Double.parseDouble(st.getLng()));
-                        if(distancesz > distances) {
-                            stasiunChooser.setText(st.getNama());
-                            st_id = st.getStasiunId();
-                            distancesz = distances;
-                        }
-                    }
-                    Log.d("ST_ID = ", st_id);
-                    doCallApi(st_id);
-
-                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
+                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stList);
 
                     stasiunChooser.setThreshold(1);
                     stasiunChooser.setAdapter(stasiunAdapter);
-                }catch (Exception E){
-                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
-                    E.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<Stasiun> call, Throwable t) {
-                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
-                t.printStackTrace();
+                }else{
+                    Toasty.error(getContext(), "Tidak dapat mengambil data stasiun, silahkan cek koneksi internet Anda.", Toast.LENGTH_SHORT, true).show();
+                }
             }
         });
 

@@ -26,26 +26,37 @@ public class DialogShow {
         line_name.setText(line);
         tv_desc.setText(long_desc);
 
-        if (severity.equals("Normal")) {
-            cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorNormal));
-        } else if (severity.equals("Medium")) {
-            cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorWarning));
-        } else if (severity.equals("Severe")) {
-            cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorDanger));
+        switch (severity) {
+            case "NORMAL":
+                cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorNormal));
+                break;
+            case "MEDIUM":
+                cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorWarning));
+                break;
+            case "SEVERE":
+                cv.setCardBackgroundColor(activity.getApplicationContext().getResources().getColor(R.color.colorDanger));
+                break;
         }
 
-        if (line.equals("Central Line")) {
-            line_icon.setImageResource(R.drawable.ic_red_line_18dp);
-        } else if (line.equals("Loop Line")) {
-            line_icon.setImageResource(R.drawable.ic_loop_line_18dp);
-        } else if (line.equals("Rangkasbitung Line")) {
-            line_icon.setImageResource(R.drawable.ic_rangkasbitung_line_18dp);
-        } else if (line.equals("Bekasi Line")) {
-            line_icon.setImageResource(R.drawable.ic_bekasi_line_18dp);
-        } else if (line.equals("Tangerang Line")) {
-            line_icon.setImageResource(R.drawable.ic_tangerang_line_18dp);
-        } else if (line.equals("Tanjung Priok Line")) {
-            line_icon.setImageResource(R.drawable.ic_tanjung_priok_18dp);
+        switch (line) {
+            case "Central Line":
+                line_icon.setImageResource(R.drawable.ic_red_line_18dp);
+                break;
+            case "Loop Line":
+                line_icon.setImageResource(R.drawable.ic_loop_line_18dp);
+                break;
+            case "Rangkasbitung Line":
+                line_icon.setImageResource(R.drawable.ic_rangkasbitung_line_18dp);
+                break;
+            case "Bekasi Line":
+                line_icon.setImageResource(R.drawable.ic_bekasi_line_18dp);
+                break;
+            case "Tangerang Line":
+                line_icon.setImageResource(R.drawable.ic_tangerang_line_18dp);
+                break;
+            case "Tanjung Priok Line":
+                line_icon.setImageResource(R.drawable.ic_tanjung_priok_18dp);
+                break;
         }
 
         FrameLayout dialogButton = (FrameLayout) dialog.findViewById(R.id.frmNo);

@@ -3,6 +3,7 @@ package com.a4sc11production.krlassist.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -28,15 +29,20 @@ import com.a4sc11production.krlassist.util.APIInterface.TimetableInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 
 /**
@@ -60,15 +66,16 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     private Date date_now = new Date();
     private boolean isStartTimePicked = true;
 
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private String train_no, relasi, line_name, dep_time, stasiun;
 
     private ArrayList<Datum> DatumList;
+    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList;
 
     private ArrayList<Timetable_> timetable_resp_list;
 
-    private Stasiun_ StasiunObj;
     private StasiunSpinnerAdapter stasiunAdapter;
-
 
     private ArrayList<Timetable> timetableList;
     private TimetableAdapter timetableAdapter;
@@ -115,43 +122,52 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
                              Bundle savedInstanceState) {
         date_now = new Date();
 
-        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
+        stList = new ArrayList<>();
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
-        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
-        calls.enqueue(new Callback<Stasiun>() {
+        CollectionReference colRef = db.collection("stasiun");
+
+        colRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
-                String display_response = "";
-                try{
-                    Stasiun stasiun = response.body();
-                    stasiunList.clear();
-                    DatumList = stasiun.getData();
-                    for (Datum datum : DatumList) {
-                        StasiunObj = datum.getStasiun();
-                        stasiunList.add(StasiunObj);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+//                        Log.d("TEST DATA FROM FBASE", document.getId() + "=>" + document.getData());
+
+                        Map<String,Object> data = document.getData();
+
+                        String st_name, kode;
+                        Double latitude, longitude;
+                        ArrayList<String> line_served, neighbors;
+                        boolean transit;
+
+                        st_name = document.getId();
+                        kode = data.get("kode").toString();
+                        latitude = Double.valueOf(data.get("latitude").toString());
+                        longitude = Double.valueOf(data.get("longitude").toString());
+
+                        line_served = (ArrayList<String>)data.get("line-served");
+                        neighbors = (ArrayList<String>)data.get("neighbors");
+
+
+                        transit = (Boolean) data.get("transit");
+
+
+                        stList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
                     }
 
-                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
+                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stList);
 
                     stasiunChooser.setThreshold(1);
                     stasiunChooser.setAdapter(stasiunAdapter);
-                }catch (Exception E){
-                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
-                    E.printStackTrace();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<Stasiun> call, Throwable t) {
-                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
-                t.printStackTrace();
+                }else{
+                    Toasty.error(getContext(), "Tidak dapat mengambil data stasiun, silahkan cek koneksi internet Anda.", Toast.LENGTH_SHORT, true).show();
+                }
             }
         });
 
-        return inflater.inflate(R.layout.fragment_jadwal, container, false);
 
+        return inflater.inflate(R.layout.fragment_jadwal, container, false);
 
     }
 

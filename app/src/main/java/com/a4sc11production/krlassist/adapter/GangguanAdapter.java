@@ -8,13 +8,14 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.  R;
-import com.a4sc11production.krlassist.model.Gangguan;
+import com.a4sc11production.krlassist.pojo.Gangguan;
 
 import java.util.ArrayList;
 
 public class GangguanAdapter extends ArrayAdapter<Gangguan> {
     private ArrayList<Gangguan> items;
     Context ctx;
+    private ArrayList<String> line;
 
     private static class ViewHolder {
         TextView line_name;
@@ -23,9 +24,9 @@ public class GangguanAdapter extends ArrayAdapter<Gangguan> {
         LinearLayout parent_line_status;
     }
 
-    public GangguanAdapter(ArrayList<Gangguan> items, Context mCtx) {
+    public GangguanAdapter(ArrayList<Gangguan> items, Context mCtx, ArrayList<String> line) {
         super(mCtx, R.layout.line_status_list_item, items);
-
+        this.line = line;
         this.items = items;
         this.ctx = mCtx;
     }
@@ -33,6 +34,7 @@ public class GangguanAdapter extends ArrayAdapter<Gangguan> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Gangguan gangguan = getItem(position);
+        String line_name = line.get(position);
 
         ViewHolder viewHolder;
 
@@ -55,40 +57,50 @@ public class GangguanAdapter extends ArrayAdapter<Gangguan> {
             viewHolder = (ViewHolder) convertView.getTag();
             result = convertView;
         }
+
+        viewHolder.line_name.setText(line.get(position));
+        viewHolder.status_short_desc.setText(gangguan.getShort_desc());
+
         String severity = gangguan.getSeverity();
 
-        viewHolder.line_name.setText(gangguan.getLine_name());
-        viewHolder.status_short_desc.setText(gangguan.getShort_desc());
-        if (!severity.equals("Normal")) {
+        if (!severity.equals("NORMAL")) {
             viewHolder.stasiun_affected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.stasiun_affected.setVisibility(View.GONE);
         }
 
-        if (severity.equals("Normal")) {
-            viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorNormal));
+        switch (severity) {
+            case "NORMAL":
+                viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorNormal));
 
-        } else if (severity.equals("Medium")) {
-            viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorWarning));
-        } else if (severity.equals("Severe")) {
-            viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorDanger));
+                break;
+            case "MEDIUM":
+                viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorWarning));
+                break;
+            case "SEVERE":
+                viewHolder.parent_line_status.setBackgroundColor(ctx.getResources().getColor(R.color.colorDanger));
+                break;
         }
 
-        String line = gangguan.getLine_name();
-
-
-        if (line.equals("Central Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_line_18dp, 0, 0, 0);
-        } else if (line.equals("Loop Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_loop_line_18dp, 0, 0, 0);
-        } else if (line.equals("Rangkasbitung Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_rangkasbitung_line_18dp, 0, 0, 0);
-        } else if (line.equals("Bekasi Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_bekasi_line_18dp, 0, 0, 0);
-        } else if (line.equals("Tangerang Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_tangerang_line_18dp, 0, 0, 0);
-        } else if (line.equals("Tanjung Priok Line")) {
-            viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_tanjung_priok_18dp, 0, 0, 0);
+        switch (line.get(position)) {
+            case "Central Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_red_line_18dp, 0, 0, 0);
+                break;
+            case "Loop Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_loop_line_18dp, 0, 0, 0);
+                break;
+            case "Rangkasbitung Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_rangkasbitung_line_18dp, 0, 0, 0);
+                break;
+            case "Bekasi Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_bekasi_line_18dp, 0, 0, 0);
+                break;
+            case "Tangerang Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_tangerang_line_18dp, 0, 0, 0);
+                break;
+            case "Tanjung Priok Line":
+                viewHolder.line_name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_tanjung_priok_18dp, 0, 0, 0);
+                break;
         }
 
         return convertView;

@@ -3,10 +3,12 @@ package com.a4sc11production.krlassist.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,21 +17,17 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.GangguanAdapter;
-import com.a4sc11production.krlassist.model.Gangguan;
-import com.a4sc11production.krlassist.model.GangguanHome.GangguanHome;
-import com.a4sc11production.krlassist.model.GangguanList.Affected;
-import com.a4sc11production.krlassist.model.GangguanList.Datum;
-import com.a4sc11production.krlassist.model.GangguanList.GangguanList;
-import com.a4sc11production.krlassist.util.APIInterface.GangguanInterface;
+import com.a4sc11production.krlassist.pojo.Gangguan;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.DialogShow;
-import com.a4sc11production.krlassist.util.KeretaAPICall;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.*;
 import es.dmoral.toasty.Toasty;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+
 
 import java.util.ArrayList;
 
@@ -49,8 +47,11 @@ public class line_status extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private ArrayList<Gangguan> gangguanList;
+    private ArrayList<String> line_name;
+    private ArrayList<Gangguan> gangguan;
     private GangguanAdapter gangguanAdapter;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private OnFragmentInteractionListener mListener;
 
@@ -102,40 +103,32 @@ public class line_status extends Fragment {
 
         ListView lv = view.findViewById(R.id.status_list);
 
-        gangguanList = new ArrayList<>();
+        gangguan = new ArrayList<>();
+        line_name = new ArrayList<>();
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-        GangguanInterface gangguanInterface = krlapi.getClient().create(GangguanInterface.class);
-        Call<GangguanList> getList = gangguanInterface.getGangguanList("https://api.clude.xyz/gangguan/");
-        getList.enqueue(new Callback<GangguanList>() {
+        CollectionReference colRef = db.collection("gangguan");
+
+        colRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<GangguanList> call, Response<GangguanList> response) {
-                GangguanList gl = response.body();
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
 
-                ArrayList<Datum> datumList = gl.getData();
-                for (Datum datum : datumList) {
-                    com.a4sc11production.krlassist.model.GangguanList.Gangguan gangguan = datum.getGangguan();
-                    ArrayList<Affected> affecteds = datum.getAffected();
-                    String line_name, stasiun_nearest, short_desc, long_desc, severity;
-                    int size = affecteds.size();
-                    for (int i = 0; i<size; i++) {
-                        short_desc = gangguan.getShortDesc();
-                        long_desc = gangguan.getLongDesc();
-                        severity = gangguan.getSeverity();
-                        stasiun_nearest = gangguan.getStasiunNearest();
-                        line_name = affecteds.get(i).getLineName();
-                        gangguanList.add(new Gangguan(line_name,short_desc,long_desc,stasiun_nearest,severity));
+                    try{
+
+                        for (QueryDocumentSnapshot document : task.getResult()){
+                            Gangguan obj = document.toObject(Gangguan.class);
+                            gangguan.add(obj);
+                            line_name.add(document.getId());
+                        }
+
+                        gangguanAdapter = new GangguanAdapter(gangguan,getContext(),line_name);
+                        lv.setAdapter(gangguanAdapter);
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
                     }
+                }else{
+                    Toasty.error(getContext(), "Tidak dapat mengambil data gangguan, silahkan cek koneksi internet Anda.", Toast.LENGTH_SHORT, true).show();
                 }
-
-                gangguanAdapter = new GangguanAdapter(gangguanList,getContext());
-                lv.setAdapter(gangguanAdapter);
-
-            }
-
-            @Override
-            public void onFailure(Call<GangguanList> call, Throwable t) {
-
             }
         });
 
@@ -143,9 +136,9 @@ public class line_status extends Fragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Gangguan g = gangguanList.get(position);
+                Gangguan g = gangguan.get(position);
 
-                String line = g.getLine_name();
+                String line = line_name.get(position);
                 String short_desc = g.getShort_desc();
                 String long_desc = g.getLong_desc();
                 String severity = g.getSeverity();

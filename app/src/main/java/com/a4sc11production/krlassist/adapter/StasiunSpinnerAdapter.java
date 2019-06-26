@@ -12,21 +12,19 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
-import com.a4sc11production.krlassist.model.StasiunSpinner;
+import com.a4sc11production.krlassist.pojo.Stasiun;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
+public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun> {
 
     private Context context;
     private int resource_id;
-    private ArrayList<Stasiun_> items, suggestions, tempItems;
+    private ArrayList<Stasiun> items, suggestions, tempItems;
 
-    public StasiunSpinnerAdapter (@NonNull Context context, int resource_id, ArrayList<Stasiun_> items){
+    public StasiunSpinnerAdapter (@NonNull Context context, int resource_id, ArrayList<Stasiun> items){
         super(context, resource_id, items);
 
         this.items = items;
@@ -47,11 +45,11 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
                 view = inflater.inflate(resource_id, parent, false);
             }
 
-            Stasiun_ stasiun =  getItem(position);
+            Stasiun stasiun = getItem(position);
             TextView stasiun_name = (TextView) view.findViewById(R.id.stasiun_name_row);
             ImageView transit = (ImageView) view.findViewById(R.id.is_transit_image);
 
-            if(stasiun.getIsTransit() == 1){
+            if(stasiun.isTransit()){
                 transit.setImageResource(R.drawable.ic_letter_t);
             }else{
                 transit.setImageResource(R.drawable.ic_letter_s);
@@ -65,7 +63,7 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
 
     @Nullable
     @Override
-    public Stasiun_ getItem(int position){
+    public Stasiun getItem(int position){
         return items.get(position);
     }
 
@@ -75,8 +73,8 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
     }
 
     public String getStasiunIdAtPosition(int position){
-        Stasiun_ stasiunSpinner = getItem(position);
-        return stasiunSpinner.getStasiunId();
+        Stasiun stasiunSpinner = getItem(position);
+        return stasiunSpinner.getNama();
     }
 
     @Override
@@ -94,7 +92,7 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
 
         @Override
         public CharSequence convertResultToString(Object resultValue){
-            Stasiun_ stasiunSpinner = (Stasiun_) resultValue;
+            Stasiun stasiunSpinner = (Stasiun) resultValue;
             return stasiunSpinner.getNama();
         }
 
@@ -102,7 +100,7 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
         protected FilterResults performFiltering(CharSequence constraint) {
             if(constraint != null){
                 suggestions.clear();
-                for (Stasiun_ stasiunSpinner: tempItems){
+                for (Stasiun stasiunSpinner: tempItems){
                     if(stasiunSpinner.getNama().toLowerCase().startsWith(constraint.toString().toLowerCase())){
                         suggestions.add(stasiunSpinner);
                     }
@@ -118,10 +116,10 @@ public class StasiunSpinnerAdapter extends ArrayAdapter<Stasiun_> {
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            ArrayList<Stasiun_> tempValues = (ArrayList<Stasiun_>) results.values;
+            ArrayList<Stasiun> tempValues = (ArrayList<Stasiun>) results.values;
             if(results != null && results.count > 0){
                 clear();
-                for (Stasiun_ stasiunObj : tempValues){
+                for (Stasiun stasiunObj : tempValues){
                     add(stasiunObj);
                     notifyDataSetChanged();
                 }

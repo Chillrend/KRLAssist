@@ -19,15 +19,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
 import com.a4sc11production.krlassist.HomeActivity;
 import com.a4sc11production.krlassist.R;
-import com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.GangguanLine;
-import com.a4sc11production.krlassist.model.GangguanHome.Datum;
-import com.a4sc11production.krlassist.model.GangguanHome.Gangguan;
-import com.a4sc11production.krlassist.model.GangguanHome.GangguanHome;
-import com.a4sc11production.krlassist.model.RealtimePos.Line;
-import com.a4sc11production.krlassist.util.APIInterface.GangguanInterface;
+import com.a4sc11production.krlassist.pojo.Gangguan;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,9 +31,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.kennyc.view.MultiStateView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import java.util.ArrayList;
 
@@ -177,94 +168,51 @@ public class home extends Fragment {
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                com.a4sc11production.krlassist.pojo.Gangguan gangguan = documentSnapshot.toObject(com.a4sc11production.krlassist.pojo.Gangguan.class);
+                Gangguan gangguan = documentSnapshot.toObject(Gangguan.class);
 
-
-            }
-        });
-
-        KeretaAPICall krlapi = new KeretaAPICall();
-        GangguanInterface gangguanInterface = krlapi.getClient().create(GangguanInterface.class);
-        Call<GangguanHome> callGangguanFirst = gangguanInterface.getGangguanForHomePage("https://api.clude.xyz/gangguan/line/" + default_line);
-        callGangguanFirst.enqueue(new Callback<GangguanHome>() {
-            @Override
-            public void onResponse(Call<GangguanHome> call, Response<GangguanHome> response) {
-
-                GangguanHome gh = response.body();
-                ArrayList<Datum> datumArrayList = new ArrayList<>();
-                datumArrayList = gh.getData();
-                for (Datum data: datumArrayList) {
-                    Gangguan gangguan = data.getGangguan();
-                    short_desc = gangguan.getShortDesc();
-                    severity = gangguan.getSeverity();
-                    stasiun_nearest = gangguan.getStasiunNearest();
-                    gangguan_id = gangguan.getGangguanId();
-                }
+                short_desc = gangguan.getShort_desc();
+                severity = gangguan.getSeverity();
+                stasiun_nearest = gangguan.getNearest_stat();
+                severity = gangguan.getSeverity();
+                ArrayList<String> line_affected;
+                line_affected = gangguan.getOther_line_affected();
 
                 gangguan_short_desc.setText(short_desc);
                 gangguan_affected_stasiun.setText("Stasiun " + stasiun_nearest);
+                setLine(line_affected);
 
+                switch (severity){
+                    case "NORMAL":
+                        cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorNormal, R.color.colorNormalDark);
+                        gangguan_icon.setImageResource(R.drawable.ic_done_all_black_24dp);
+                        gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorNormal));
 
-                KeretaAPICall apis = new KeretaAPICall();
-                GangguanInterface gangInt = krlapi.getClient().create(GangguanInterface.class);
-                Call<GangguanLine> calling = gangInt.getGangguanAfterAbove("https://api.clude.xyz/gangguan/" + gangguan_id);
-                calling.enqueue(new Callback<GangguanLine>() {
-                    @Override
-                    public void onResponse(Call<GangguanLine> call, Response<GangguanLine> response) {
-                        GangguanLine gl = response.body();
-                        try{
-                            ArrayList<com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum> afterGangguanList = new ArrayList<>();
-                            afterGangguanList = gl.getData();
-                            ArrayList<String> line_affected = new ArrayList<>();
+                        gangguan_affected_stasiun.setText(line_affected.get(0));
 
-                            for (com.a4sc11production.krlassist.model.GangguanHome.AfterGangguan.Datum datum : afterGangguanList) {
-                                line_affected = datum.getLinename();
-                            }
+                        line_container_1.setVisibility(View.GONE);
+                        line_container_2.setVisibility(View.GONE);
+                        line_container_3.setVisibility(View.GONE);
+                        jalurt_terganggu_static.setVisibility(View.GONE);
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) btn_info_lanjut.getLayoutParams();
+                        params.addRule(RelativeLayout.BELOW, R.id.gangguan_normal_text);
+                        gangguan_normal_text.setVisibility(View.VISIBLE);
 
-                            setLine(line_affected);
+                        break;
+                    case "MEDIUM" :
+                        cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorWarning, R.color.colorWarningDark);
+                        gangguan_icon.setImageResource(R.drawable.ic_warning);
+                        gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorWarning));
 
-                            if(severity.equals("Normal")){
-                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorNormal, R.color.colorNormalDark);
-                                gangguan_icon.setImageResource(R.drawable.ic_done_all_black_24dp);
-                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorNormal));
+                        break;
+                    case "SEVERE" :
+                        cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorDanger, R.color.colorDangerDark);
+                        gangguan_icon.setImageResource(R.drawable.ic_danger);
+                        gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorDanger));
 
-                                gangguan_affected_stasiun.setText(line_affected.get(0));
+                        break;
+                }
 
-                                line_container_1.setVisibility(View.GONE);
-                                line_container_2.setVisibility(View.GONE);
-                                line_container_3.setVisibility(View.GONE);
-                                jalurt_terganggu_static.setVisibility(View.GONE);
-                                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) btn_info_lanjut.getLayoutParams();
-                                params.addRule(RelativeLayout.BELOW, R.id.gangguan_normal_text);
-                                gangguan_normal_text.setVisibility(View.VISIBLE);
-                            }else if(severity.equals("Medium")){
-                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorWarning, R.color.colorWarningDark);
-                                gangguan_icon.setImageResource(R.drawable.ic_warning);
-                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorWarning));
-                            }else if(severity.equals("Severe")){
-                                cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorDanger, R.color.colorDangerDark);
-                                gangguan_icon.setImageResource(R.drawable.ic_danger);
-                                gangguan_multistate.setBackgroundColor(getActivity().getResources().getColor(R.color.colorDanger));
-                            }
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<GangguanLine> call, Throwable t) {
-                        gangguan_multistate.setViewState(MultiStateView.VIEW_STATE_ERROR);
-                        t.printStackTrace();
-                    }
-                });
                 gangguan_multistate.setViewState(MultiStateView.VIEW_STATE_CONTENT);
-            }
-
-            @Override
-            public void onFailure(Call<GangguanHome> call, Throwable t) {
-                gangguan_multistate.setViewState(MultiStateView.VIEW_STATE_ERROR);
-                t.printStackTrace();
             }
         });
 
