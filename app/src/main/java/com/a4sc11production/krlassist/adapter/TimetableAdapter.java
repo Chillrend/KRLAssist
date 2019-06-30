@@ -8,10 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
-import com.a4sc11production.krlassist.model.Timetable;
+import com.a4sc11production.krlassist.pojo.Timetable;
 
 
-import java.sql.Time;
 import java.util.ArrayList;
 
 public class TimetableAdapter extends ArrayAdapter<Timetable> {
@@ -67,18 +66,25 @@ public class TimetableAdapter extends ArrayAdapter<Timetable> {
         viewHolder.relasi.setText(timetable.getRelasi());
 
         String line = timetable.getLine_served();
-        if(line.equals("Central Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.RedLine));
-        }else if(line.equals("Loop Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.LoopLine));
-        }else if(line.equals("Rangkasbitung Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.RangkasbitungLine));
-        }else if(line.equals("Bekasi Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.BekasiLine));
-        }else if(line.equals("Tangerang Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.TanggerangLine));
-        }else if(line.equals("Tanjung Priok Line")){
-            viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.TanjungPriokLine));
+        switch (line) {
+            case "Central Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.RedLine));
+                break;
+            case "Loop Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.LoopLine));
+                break;
+            case "Rangkasbitung Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.RangkasbitungLine));
+                break;
+            case "Bekasi Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.BekasiLine));
+                break;
+            case "Tangerang Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.TanggerangLine));
+                break;
+            case "Tanjung Priok Line":
+                viewHolder.parent_timetable_layout.setBackgroundColor(ctx.getResources().getColor(R.color.TanjungPriokLine));
+                break;
         }
 
         return convertView;

@@ -18,16 +18,10 @@ import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
 import com.a4sc11production.krlassist.adapter.TimetableAdapter;
 import com.a4sc11production.krlassist.model.Stasiun.Datum;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
-import com.a4sc11production.krlassist.model.StasiunSpinner;
-import com.a4sc11production.krlassist.model.Timetable;
-import com.a4sc11production.krlassist.model.TimetableAP.Data;
+import com.a4sc11production.krlassist.pojo.Timetable;
 import com.a4sc11production.krlassist.model.TimetableAP.Timetable_;
-import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
-import com.a4sc11production.krlassist.util.APIInterface.TimetableInterface;
+import com.a4sc11production.krlassist.pojo.Krl;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
-import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,13 +30,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import es.dmoral.toasty.Toasty;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static android.support.constraint.Constraints.TAG;
 
 
 /**
@@ -60,8 +52,8 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     private String mParam1;
     private String mParam2;
 
-    private ArrayList<Stasiun> stasiunList;
     private String time_1,time_2,stasiun_id;
+    private int time_1_int, time_2_int;
     private static final String FRAG_TAG_TIME_PICKER = "timePickerDialogFragment";
     private Date date_now = new Date();
     private boolean isStartTimePicked = true;
@@ -71,7 +63,7 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
     private String train_no, relasi, line_name, dep_time, stasiun;
 
     private ArrayList<Datum> DatumList;
-    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList;
+    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList, backupStList;
 
     private ArrayList<Timetable_> timetable_resp_list;
 
@@ -123,6 +115,7 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         date_now = new Date();
 
         stList = new ArrayList<>();
+        backupStList = new ArrayList<>();
 
         CollectionReference colRef = db.collection("stasiun");
 
@@ -153,6 +146,7 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
 
 
                         stList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
+                        backupStList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
                     }
 
                     stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stList);
@@ -188,11 +182,11 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         stasiunChooser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Stasiun_ stasiunSpinner = (Stasiun_) parent.getItemAtPosition(position);
-                stasiun_id = stasiunSpinner.getStasiunId();
+                com.a4sc11production.krlassist.pojo.Stasiun stasiunSpinner = (com.a4sc11production.krlassist.pojo.Stasiun) parent.getItemAtPosition(position);
+                stasiun_id = stasiunSpinner.getNama();
 
                 if(evalForm()){
-                    doCallApiRequests(stasiun_id,time_1,time_2);
+                    doCallApiRequests(stasiun_id,convertTimeToInt(time_1),convertTimeToInt(time_2));
                 }
             }
         });
@@ -270,8 +264,28 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
             time_2 = hourOfDay + ":" + minute;
             time_picker_2.setText(hourOfDay + ":" + minute);
             if(evalForm()){
-                doCallApiRequests(stasiun_id,time_1,time_2);
+                doCallApiRequests(stasiun_id,convertTimeToInt(time_1),convertTimeToInt(time_2));
             }
+        }
+    }
+
+    public int convertTimeToInt(String time){
+        List<String> timeList = Arrays.asList(time.split(":"));
+        int hour;
+
+        int minute;
+
+        if(timeList.get(1).startsWith("0")){
+            hour = Integer.valueOf(timeList.get(0));
+            return (hour * 100) + Integer.valueOf(timeList.get(1));
+        }else if(timeList.get(0).contentEquals("0")){
+            hour = 25;
+            minute = Integer.parseInt(timeList.get(1));
+            return Integer.valueOf(String.valueOf(hour) + String.valueOf(minute));
+        }else{
+            hour = Integer.valueOf(timeList.get(0));
+            minute = Integer.parseInt(timeList.get(1));
+            return Integer.valueOf(String.valueOf(hour) + String.valueOf(minute));
         }
     }
 
@@ -311,48 +325,175 @@ public class jadwal extends Fragment implements RadialTimePickerDialogFragment.O
         }
     }
 
-    public void doCallApiRequests(String st_id, String time_range1, String time_range2){
-        ArrayList<com.a4sc11production.krlassist.model.TimetableAP.Timetable> stasiunList = new ArrayList<>();
+    public void doCallApiRequests(String st_id, int time_range1, int time_range2){
 
+        ArrayList<Krl> krlList = new ArrayList<>();
+        ArrayList<String> krlNo = new ArrayList<>();
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-        TimetableInterface timetableInterface = krlapi.getClient().create(TimetableInterface.class);
-        Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> calls = timetableInterface.getJadwal("https://api.clude.xyz/timetable/getrange/"+ st_id +"/from/"+ time_range1 +"/to/" + time_range2);
-        calls.enqueue(new Callback<com.a4sc11production.krlassist.model.TimetableAP.Timetable>() {
+        CollectionReference krlRef = db.collection("krl");
+        krlRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Response<com.a4sc11production.krlassist.model.TimetableAP.Timetable> response) {
-                String display_response = "";
-                try{
-                    com.a4sc11production.krlassist.model.TimetableAP.Timetable timetable = response.body();
-                    timetableList = new ArrayList<>();
-                    timetableList.clear();
-                    Data data = timetable.getData();
-                    timetable_resp_list = data.getTimetable();
-                    for (Timetable_ timetables : timetable_resp_list) {
-                        train_no = timetables.getTrainNo();
-                        relasi = timetables.getRelasi();
-                        stasiun = timetables.getStasiun();
-                        line_name = timetables.getLineName();
-                        dep_time = timetables.getDepTime().substring(0,5);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        Krl krlObject = document.toObject(Krl.class);
 
-                        timetableList.add(new Timetable(train_no,relasi,stasiun,line_name,dep_time));
+                        try{
+                            Map<String,Integer> schedule = krlObject.getSchedule();
+                            Integer value = schedule.containsKey(st_id) ? schedule.get(st_id) : 0;
+                            Log.d(TAG, "onComplete: int value = " + value);
+                            if(value != null && value > time_range1 && value < time_range2){
+                                krlList.add(krlObject);
+                                krlNo.add(document.getId());
+
+                                Log.d(TAG, "on time evaluation: " + krlNo + " : " + st_id + " " + value);
+                            }else{
+                                Log.d(TAG, "no schedule found");
+                            }
+                        }catch (NullPointerException e){
+                            e.printStackTrace();
+                            Log.e(TAG, e.getMessage());
+                        }
                     }
+                    renderJadwalListView(krlList, backupStList, krlNo, st_id);
+                }else{
+                    Log.e(TAG, "onComplete: Error getting document", task.getException());
+                }
+            }
+        });
 
-                    timetableAdapter = new TimetableAdapter(timetableList,getContext());
-                    lv.setAdapter(timetableAdapter);
+//        ArrayList<com.a4sc11production.krlassist.model.TimetableAP.Timetable> stasiunList = new ArrayList<>();
+//
+//        KeretaAPICall krlapi = new KeretaAPICall();
+//        TimetableInterface timetableInterface = krlapi.getClient().create(TimetableInterface.class);
+//        Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> calls = timetableInterface.getJadwal("https://api.clude.xyz/timetable/getrange/"+ st_id +"/from/"+ time_range1 +"/to/" + time_range2);
+//        calls.enqueue(new Callback<com.a4sc11production.krlassist.model.TimetableAP.Timetable>() {
+//            @Override
+//            public void onResponse(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Response<com.a4sc11production.krlassist.model.TimetableAP.Timetable> response) {
+//                String display_response = "";
+//                try{
+//                    com.a4sc11production.krlassist.model.TimetableAP.Timetable timetable = response.body();
+//                    timetableList = new ArrayList<>();
+//                    timetableList.clear();
+//                    Data data = timetable.getData();
+//                    timetable_resp_list = data.getTimetable();
+//                    for (Timetable_ timetables : timetable_resp_list) {
+//                        train_no = timetables.getTrainNo();
+//                        relasi = timetables.getRelasi();
+//                        stasiun = timetables.getStasiun();
+//                        line_name = timetables.getLineName();
+//                        dep_time = timetables.getDepTime().substring(0,5);
+//
+//                        timetableList.add(new Timetable(train_no,relasi,stasiun,line_name,dep_time));
+//                    }
+//
+//                    timetableAdapter = new TimetableAdapter(timetableList,getContext());
+//                    lv.setAdapter(timetableAdapter);
+//
+//                }catch (Exception E){
+//                    Log.e("On Timetable Call", "can"t get Timetable, reason:" + E.toString());
+//                    E.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Throwable t) {
+//                Log.e("On Timetable Call", "can"t get Timetable, reason:" + t.toString());
+//                t.printStackTrace();
+//            }
+//        });
+    }
 
-                }catch (Exception E){
-                    Log.e("On Timetable Call", "can't get Timetable, reason:" + E.toString());
-                    E.printStackTrace();
+    public void renderJadwalListView(ArrayList<Krl> krl, ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> statList, ArrayList<String> noKrl, String stasiun_id){
+        ArrayList<Timetable> jadwalList = new ArrayList<>();
+        for (int i = 0; i < krl.size(); i++) {
+            Krl krlObj = krl.get(i);
+            String noKa = noKrl.get(i);
+            String strDepartureTime = "";
+
+            Map<String,Integer> jadwal = krlObj.getSchedule();
+
+            Integer departureTime = jadwal.get(stasiun_id);
+            if(departureTime != null){
+                strDepartureTime = departureTime.toString();
+                if(strDepartureTime.length() < 4){
+                    strDepartureTime = "0" + strDepartureTime;
+
+                    StringBuilder builder = new StringBuilder(strDepartureTime);
+                    builder.insert(2, ":");
+                    strDepartureTime = builder.toString();
+                }else{
+                    StringBuilder builder = new StringBuilder(strDepartureTime);
+                    builder.insert(2, ":");
+                    strDepartureTime = builder.toString();
+                }
+            }
+            String relasi = krlObj.getLine();
+            String[] relasiSplit = relasi.split("-");
+            String terminal = "", terminus = "";
+            for(com.a4sc11production.krlassist.pojo.Stasiun stat : statList){
+                Log.d(TAG, "renderJadwalListView in iteration : "+ i + ": " + stat.getKode());
+                if(stat.getKode().equals(relasiSplit[0])){
+                    terminal = stat.getNama();
+                }else if(stat.getKode().equals(relasiSplit[1])){
+                    terminus = stat.getNama();
+                }
+
+                if(terminal != null && !terminal.isEmpty() && terminus != null && !terminus.isEmpty()){
+                    break;
                 }
             }
 
-            @Override
-            public void onFailure(Call<com.a4sc11production.krlassist.model.TimetableAP.Timetable> call, Throwable t) {
-                Log.e("On Timetable Call", "can't get Timetable, reason:" + t.toString());
-                t.printStackTrace();
-            }
-        });
+            relasi = terminal + "-" + terminus;
+            String line = determineLine(relasi);
+
+            Timetable finalSchedule = new Timetable(noKa, relasi, stasiun_id, line, strDepartureTime);
+            jadwalList.add(finalSchedule);
+        }
+
+        timetableAdapter = new TimetableAdapter(jadwalList, getContext());
+        lv.setAdapter(timetableAdapter);
+
+    }
+
+    public String determineLine(String line){
+        switch (line) {
+            case "DP-AK":
+            case "AK-DP":
+            case "DP-JNG":
+            case "JNG-DP":
+            case "BOO-AK":
+            case "AK-BOO":
+            case "JNG-BOO":
+            case "BOO-JNG":
+            case "NMO-AK":
+            case "AK-NMO":
+                return "Loop Line";
+            case "BOO-JAKK":
+            case "JAKK-BOO":
+            case "DP-MRI":
+            case "MRI-DP":
+            case "BOO-MRI":
+            case "MRI-BOO":
+            case "JAKK-DP":
+            case "DP-JAKK":
+                return "Central Line";
+            case "JAKK-CKR":
+            case "CKR-JAKK":
+            case "MRI-CKR":
+            case "CKR-MRI":
+            case "MRI-BKS":
+            case "BKS-MRI":
+            case "BKS-JAKK":
+            case "JAKK-BKS":
+                return "Bekasi Line";
+            case "Tangerang Line":
+                return "Tangerang Line";
+            case "Rangkasbitung Line":
+                return "Rangkasbitung Line";
+            default:
+                return "Central Line";
+        }
     }
 
     /**

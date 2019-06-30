@@ -21,8 +21,8 @@ import android.widget.Toast;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
 import com.a4sc11production.krlassist.model.Stasiun.Datum;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
 import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
+import com.a4sc11production.krlassist.pojo.Stasiun;
 import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
@@ -108,6 +108,7 @@ public class tariff extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        stList = new ArrayList<>();
 
         CollectionReference colRef = db.collection("stasiun");
 
@@ -179,9 +180,9 @@ public class tariff extends Fragment {
         stasiunChooser1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Stasiun_ stat =  stasiunList.get(position);
-                lat1 = Double.parseDouble(stat.getLat());
-                lng1 = Double.parseDouble(stat.getLng());
+                Stasiun stat =  stList.get(position);
+                lat1 = stat.getLatitude();
+                lng1 = stat.getLongitude();
 
                 st_1 = stat.getNama();
             }
@@ -190,12 +191,12 @@ public class tariff extends Fragment {
         stasiunChooser2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Stasiun_ stat =  stasiunList.get(position);
+                Stasiun stat =  stList.get(position);
 
                 st_2 = stat.getNama();
 
-                lat2 = Double.parseDouble(stat.getLat());
-                lng2 = Double.parseDouble(stat.getLng());
+                lat2 = stat.getLatitude();
+                lng2 = stat.getLongitude();
 
                 if(!lat1.isNaN() && !lng1.isNaN() && !lat2.isNaN() && !lng2.isNaN()){
                     double Dist = distance(lat1,lat2,lng1,lng2,10,10);

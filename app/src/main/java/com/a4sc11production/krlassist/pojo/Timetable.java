@@ -1,4 +1,4 @@
-package com.a4sc11production.krlassist.model;
+package com.a4sc11production.krlassist.pojo;
 
 public class Timetable {
     private String nomor_ka;

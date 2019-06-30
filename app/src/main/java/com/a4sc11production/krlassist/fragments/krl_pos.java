@@ -41,8 +41,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,7 +66,11 @@ public class krl_pos extends Fragment {
     public final static double AVERAGE_RADIUS_OF_EARTH = 6371;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList;
+
+    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList, backupStList;
+    private ArrayList<com.a4sc11production.krlassist.pojo.Krl> krlList;
+
+    private Map<String, com.a4sc11production.krlassist.pojo.Krl> krlListing;
 
     private String[] testingAutoComplete = {"Bleh", "Blah", "Bloh", "Blih", "Bluh"};
     private AutoCompleteTextView stasiunChooser;
@@ -111,60 +118,41 @@ public class krl_pos extends Fragment {
         }
     }
 
-    @Override
+    @Override @SuppressWarnings("unchecked")
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        krlList = new ArrayList<>();
+        krlListing = new HashMap<>();
 
-//        ArrayList<Stasiun_> stasiunList = new ArrayList<>();
 
-//        KeretaAPICall krlapi = new KeretaAPICall();
-//        StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
-//        Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
-//        calls.enqueue(new Callback<Stasiun>() {
-//            @Override
-//            public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
-//                String display_response = "";
-//                try{
-//                    Stasiun stasiun = response.body();
-//                    stasiunList.clear();
-//                    DatumList = stasiun.getData();
-//                    for (Datum datum : DatumList) {
-//                        StasiunObj = datum.getStasiun();
-//                        stasiunList.add(StasiunObj);
-//                    }
-//
-//                    SharedPreferences spref = getActivity().getSharedPreferences("LOCATION_STORAGE", Context.MODE_PRIVATE);
-//                    Double lat = Double.parseDouble(spref.getString("lat", ""));
-//                    Double lng = Double.parseDouble(spref.getString("lng", ""));
-//
-//                    for (Stasiun_ st:stasiunList) {
-//                        int distances = calculateDistance(lat,lng,Double.parseDouble(st.getLat()),Double.parseDouble(st.getLng()));
-//                        if(distancesz > distances) {
-//                            stasiunChooser.setText(st.getNama());
-//                            st_id = st.getStasiunId();
-//                            distancesz = distances;
-//                        }
-//                    }
-//                    Log.d("ST_ID = ", st_id);
-//                    doCallApi(st_id);
-//
-//                    stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stasiunList);
-//
-//                    stasiunChooser.setThreshold(1);
-//                    stasiunChooser.setAdapter(stasiunAdapter);
-//                }catch (Exception E){
-//                    Log.e("On Stasiun Call", "can't get stasiun, reason:" + E.toString());
-//                    E.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Stasiun> call, Throwable t) {
-//                Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
-//                t.printStackTrace();
-//            }
-//        });
+
+        CollectionReference krlRef = db.collection("krl");
+        krlRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    ArrayList<String> noKrl = new ArrayList<>();
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        Map<String, Object> data = document.getData();
+
+                        String line = data.get("line").toString();
+                        Map<String,String> realtime_pos = (HashMap<String, String>) data.get("line-served");
+//                        Map<String,String> realtime_pos = new HashMap<String, String>();
+                        Map<String,Integer> schedule = (HashMap<String,Integer>) data.get("schedule");
+
+                        com.a4sc11production.krlassist.pojo.Krl krlObject = new com.a4sc11production.krlassist.pojo.Krl(line, realtime_pos, schedule);
+
+                        Log.d(TAG, "onComplete: " + document.getId() + " : " + line);
+
+                        krlListing.put(document.getId(), krlObject);
+                    }
+                }
+            }
+        });
+
+        stList = new ArrayList<>();
+        backupStList = new ArrayList<>();
 
         CollectionReference colRef = db.collection("stasiun");
 
@@ -195,6 +183,7 @@ public class krl_pos extends Fragment {
 
 
                         stList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
+                        backupStList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
                     }
 
                     stasiunAdapter = new StasiunSpinnerAdapter(getContext(), R.layout.custom_autotext_row, stList);
