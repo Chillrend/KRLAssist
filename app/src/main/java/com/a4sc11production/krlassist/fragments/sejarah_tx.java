@@ -1,5 +1,6 @@
 package com.a4sc11production.krlassist.fragments;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.content.Context;
 import android.net.Uri;
@@ -19,9 +20,14 @@ import com.a4sc11production.krlassist.adapter.TxAdapter;
 import com.a4sc11production.krlassist.model.KMT.TxHistory.Result;
 import com.a4sc11production.krlassist.model.KMT.TxHistory.TxHistory;
 import com.a4sc11production.krlassist.model.TxTemporary;
+import com.a4sc11production.krlassist.pojo.KmtTransaction;
 import com.a4sc11production.krlassist.util.APIInterface.KMTInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.*;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,6 +46,8 @@ public class sejarah_tx extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private String mParam1;
     private String mParam2;
@@ -98,30 +106,25 @@ public class sejarah_tx extends Fragment {
         }
 
 
-        KeretaAPICall krlapi = new KeretaAPICall();
+        CollectionReference txRef = db.collection("transaction");
+        Query txQuery = txRef.whereEqualTo("kmt_no", UIDs);
 
-        KMTInterface kmtInterface = krlapi.getClient().create(KMTInterface.class);
-        String urls = "https://api.clude.xyz/kmt/history/" + UIDs;
-        Call<TxHistory> calls = kmtInterface.getKMTHistory(urls);
-        calls.enqueue(new Callback<TxHistory>() {
+        ArrayList<KmtTransaction> kmtTransactionList = new ArrayList<>();
+
+        txQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<TxHistory> call, Response<TxHistory> response) {
-                TxHistory txHistory = response.body();
-                temporarieslist = new ArrayList<>();
-                temporarieslist.clear();
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        KmtTransaction kmtTxObj = document.toObject(KmtTransaction.class);
+                        kmtTransactionList.add(kmtTxObj);
+                    }
 
-                ArrayList<Result> results = txHistory.getResult();
-                for (Result res : results) {
-                    temporarieslist.add(new TxTemporary(res.getTransactionType(),res.getStasiun(),res.getAmount()));
+                    TxAdapter txAdapter = new TxAdapter(kmtTransactionList, getContext());
+                    lv.setAdapter(txAdapter);
+                }else{
+                    Toasty.error(getContext(), "Tidak dapat mengambil data, silahkan cek koneksi internet Anda", Toasty.LENGTH_SHORT).show();
                 }
-
-                TxAdapter txAdapter = new TxAdapter(temporarieslist, getContext());
-                lv.setAdapter(txAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<TxHistory> call, Throwable t) {
-
             }
         });
 
@@ -130,8 +133,6 @@ public class sejarah_tx extends Fragment {
 
     public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
 
 
         lv = view.findViewById(R.id.sejarah_tx_listview);

@@ -8,6 +8,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.NfcA;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
@@ -26,8 +27,15 @@ import com.a4sc11production.krlassist.model.KMT.MultiTrip;
 import com.a4sc11production.krlassist.model.RealtimePos.Line;
 import com.a4sc11production.krlassist.util.APIInterface.KMTInterface;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.kennyc.view.MultiStateView;
 import com.a4sc11production.krlassist.HomeActivity;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,6 +60,8 @@ public class nfc_kmt extends Fragment {
     private String mParam1;
     private String mParam2;
     private String UID;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private OnFragmentInteractionListener mListener;
 
@@ -144,46 +154,36 @@ public class nfc_kmt extends Fragment {
         UID = UIDS;
         kmt_uid_text.setText(UIDS);
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-
-        kmtInterface = krlapi.getClient().create(KMTInterface.class);
-        String urls = "https://api.clude.xyz/kmt/" + UIDS;
-
-        Call<MultiTrip> calls = kmtInterface.getBalance(urls);
-        calls.enqueue(new Callback<MultiTrip>() {
+        CollectionReference kmtRef = db.collection("kmt");
+        DocumentReference kmt = kmtRef.document(UIDS);
+        kmt.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onResponse(Call<MultiTrip> call, Response<MultiTrip> response) {
-                String display_response = "";
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document.exists()){
+                        com.a4sc11production.krlassist.pojo.Kmt kmtResult = document.toObject(com.a4sc11production.krlassist.pojo.Kmt.class);
 
-                try{
-                    MultiTrip kmt = response.body();
+                        kmtBals.setText(Integer.toString(kmtResult.getBalance()));
 
-                    List<Kmt> jsonResponse = kmt.getKmt();
-
-                    for(Kmt kmte : jsonResponse){
-                        kmtBals.setText(Integer.toString(kmte.getBalance()));
+                        mMultiStateView.setViewState(MultiStateView.VIEW_STATE_CONTENT);
+                    }else{
+                        Toasty.error(getContext(),"Tidak dapat menemukan KMT", Toast.LENGTH_SHORT).show();
+                        mMultiStateView.setViewState(MultiStateView.VIEW_STATE_LOADING);
                     }
-                    mMultiStateView.setViewState(MultiStateView.VIEW_STATE_CONTENT);
-                }catch (Exception e){
-                    e.printStackTrace();
+                }else{
+                    Toasty.error(getContext(),"Tidak dapat mengambil data, Silahkan cek koneksi internet Anda", Toast.LENGTH_SHORT).show();
+                    mMultiStateView.setViewState(MultiStateView.VIEW_STATE_LOADING);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<MultiTrip> call, Throwable t) {
-
             }
         });
     }
-
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
-
-
 
     @Override
     public void onAttach(Context context) {

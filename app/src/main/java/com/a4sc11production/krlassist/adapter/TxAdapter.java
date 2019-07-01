@@ -10,12 +10,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.model.TxTemporary;
+import com.a4sc11production.krlassist.pojo.KmtTransaction;
 
 import java.util.ArrayList;
 
-public class TxAdapter extends ArrayAdapter<TxTemporary> {
+public class TxAdapter extends ArrayAdapter<KmtTransaction> {
 
-    private ArrayList<TxTemporary> items;
+    private ArrayList<KmtTransaction> items;
     Context ctx;
 
     private static class ViewHolder {
@@ -27,7 +28,7 @@ public class TxAdapter extends ArrayAdapter<TxTemporary> {
         RelativeLayout parent_container;
     }
 
-    public TxAdapter(ArrayList<TxTemporary> data, Context mCtx){
+    public TxAdapter(ArrayList<KmtTransaction> data, Context mCtx){
         super(mCtx, R.layout.realtime_list_item, data);
 
         this.items = data;
@@ -36,7 +37,7 @@ public class TxAdapter extends ArrayAdapter<TxTemporary> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TxTemporary txTemporary = getItem(position);
+        KmtTransaction txTemporary = getItem(position);
 
         ViewHolder viewHolder;
         final View result;
@@ -60,10 +61,10 @@ public class TxAdapter extends ArrayAdapter<TxTemporary> {
             result = convertView;
         }
 
-        String txType = txTemporary.getTx_type();
+        String txType = txTemporary.getTransaction_type();
         if(txType.equals("DEDUCTION_TRAVEL")){
             viewHolder.tx_type.setText("Perjalanan");
-            viewHolder.stasiun.setText("Stasiun " + txTemporary.getStasiun());
+            viewHolder.stasiun.setText("Stasiun " + txTemporary.getStasiun_at());
             viewHolder.deduction_or_addition.setText("Pengurangan");
             viewHolder.parent_container.setBackgroundColor(ctx.getResources().getColor(R.color.colorDanger));
             viewHolder.icon.setImageResource(R.drawable.ic_remove_24dp);
@@ -72,7 +73,7 @@ public class TxAdapter extends ArrayAdapter<TxTemporary> {
         }else if(txType.equals("ADDITION_STAT")){
             viewHolder.tx_type.setText("Isi Ulang");
             viewHolder.deduction_or_addition.setText("Penambahan");
-            viewHolder.stasiun.setText("Stasiun " + txTemporary.getStasiun());
+            viewHolder.stasiun.setText("Stasiun " + txTemporary.getStasiun_at());
             viewHolder.icon.setImageResource(R.drawable.ic_plus);
             viewHolder.parent_container.setBackgroundColor(ctx.getResources().getColor(R.color.colorNormal));
             String amount = String.valueOf(txTemporary.getAmount());
