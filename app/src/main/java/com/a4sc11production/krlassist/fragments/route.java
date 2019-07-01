@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,19 +19,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.*;
 import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.MapInfoWindowAdapter;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
-import com.a4sc11production.krlassist.model.Line.Line;
 import com.a4sc11production.krlassist.model.Line.Result;
 import com.a4sc11production.krlassist.model.Stasiun.Datum;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
 import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunTemp;
+import com.a4sc11production.krlassist.pojo.Line;
+import com.a4sc11production.krlassist.pojo.Stasiun;
 import com.a4sc11production.krlassist.util.APIInterface.RouteInterface;
 import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
@@ -38,6 +36,13 @@ import com.a4sc11production.krlassist.util.DirectionsJSONParser;
 import com.a4sc11production.krlassist.util.KeretaAPICall;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import es.dmoral.toasty.Toasty;
 import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +55,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,6 +75,11 @@ public class route extends Fragment {
     private String mParam2;
     private ArrayList<StasiunTemp> stasiunTemps;
     private ArrayList<Result> result;
+    private ArrayList<String> linusNamus;
+    private Map<String, com.a4sc11production.krlassist.pojo.Line> lineMap;
+    private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stasiunList;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     MapView mMapView;
     private GoogleMap googleMap;
@@ -111,24 +123,66 @@ public class route extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        KeretaAPICall krlapi = new KeretaAPICall();
-        RouteInterface routeInterface = krlapi.getClient().create(RouteInterface.class);
-        Call<Line> calls = routeInterface.getLine("https://api.clude.xyz/line");
-        calls .enqueue(new Callback<Line>() {
-            @Override
-            public void onResponse(Call<Line> call, Response<Line> response) {
-                Line layn = response.body();
-                result = layn.getResult();
-                ArrayAdapter<Result> adapter = new ArrayAdapter<Result>(getContext(), R.layout.spinner_selected_item, result);
-                adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        stasiunList = new ArrayList<>();
 
-                spinner.setAdapter(adapter);
+
+        CollectionReference colRef = db.collection("stasiun");
+
+        colRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+
+                        Map<String,Object> data = document.getData();
+
+                        String st_name, kode;
+                        Double latitude, longitude;
+                        ArrayList<String> line_served, neighbors;
+                        boolean transit;
+
+                        st_name = document.getId();
+                        kode = data.get("kode").toString();
+                        latitude = Double.valueOf(data.get("latitude").toString());
+                        longitude = Double.valueOf(data.get("longitude").toString());
+
+                        line_served = (ArrayList<String>)data.get("line-served");
+                        neighbors = (ArrayList<String>)data.get("neighbors");
+
+
+                        transit = (Boolean) data.get("transit");
+
+
+                        stasiunList.add(new com.a4sc11production.krlassist.pojo.Stasiun(st_name,kode,latitude,line_served,longitude,neighbors,transit));
+                    }
+
+                }else{
+                    Toasty.error(getContext(), "Tidak dapat mengambil data stasiun, silahkan cek koneksi internet Anda.", Toast.LENGTH_SHORT, true).show();
+                }
             }
+        });
 
+        lineMap = new HashMap<>();
+        linusNamus = new ArrayList<>();
+
+        CollectionReference lineRef = db.collection("line");
+        lineRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onFailure(Call<Line> call, Throwable t) {
-                Log.e("On Line Call", "Can't get Line, reason : " + t.toString());
-                t.printStackTrace();
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()){
+                        com.a4sc11production.krlassist.pojo.Line lineObject = document.toObject(com.a4sc11production.krlassist.pojo.Line.class);
+                        String line_name = document.getId();
+
+                        lineMap.put(line_name, lineObject);
+                        linusNamus.add(line_name);
+
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_selected_item, linusNamus);
+                    adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                    spinner.setAdapter(adapter);
+                }
             }
         });
 
@@ -144,74 +198,89 @@ public class route extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int white = Color.parseColor("#ffffff");
+                int white = Color.parseColor("#FFFFFF");
                 ((TextView) parent.getChildAt(0)).setTextColor(white);
-                Result res = result.get(position);
 
-                String line_name = res.getLineName();
+                String res = linusNamus.get(position);
+                Line line = lineMap.get(res);
+                ArrayList<String> stasiunServed = line.getStasiun_served();
 
-                KeretaAPICall krlapi = new KeretaAPICall();
-                StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
-                Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
-                calls.enqueue(new Callback<Stasiun>() {
-                    @Override
-                    public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
-                        String display_response = "";
-                        googleMap.clear();
-                        Stasiun stat = response.body();
+                ArrayList<Stasiun> finalStasiun = new ArrayList<>();
 
-                        ArrayList<Datum> data = stat.getData();
-                        for (Datum dat : data) {
-                            Stasiun_ stasiun_ = dat.getStasiun();
-                            ArrayList<String> lineArr = dat.getLinenamearr();
-                            if(lineArr.contains(line_name)){
-                                stasiunTemps = new ArrayList<>();
-                                stasiunTemps.clear();
-                                Boolean isTransit;
-                                if(stasiun_.getIsTransit() == 0){
-                                    isTransit = false;
-                                }else{
-                                    isTransit = true;
-                                }
-                                stasiunTemps.add(new StasiunTemp(stasiun_.getStasiunId(), stasiun_.getNama(),
-                                        Double.parseDouble(stasiun_.getLat()), Double.parseDouble(stasiun_.getLng()),isTransit, lineArr));
+                googleMap.clear();
 
-                                for(StasiunTemp temp : stasiunTemps){
-                                    LatLng pos = new LatLng(temp.getLat(), temp.getLng());
-
-                                    MarkerOptions markerOptions = new MarkerOptions();
-                                    markerOptions.position(pos);
-
-                                    Marker m = googleMap.addMarker(markerOptions);
-                                    m.setTag(temp);
-                                }
-                                MapInfoWindowAdapter miwa = new MapInfoWindowAdapter(getContext());
-                                googleMap.setInfoWindowAdapter(miwa);
-                            }
+                for (int i = 0; i < stasiunServed.size(); i++) {
+                    for (Stasiun stat : stasiunList) {
+                        if (stat.getNama().equals(stasiunServed.get(i))) {
+                            finalStasiun.add(stat);
                         }
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<Stasiun> call, Throwable t) {
-                        Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
-                        t.printStackTrace();
+                ArrayList<StasiunTemp> statTemp = new ArrayList<>();
+                statTemp.clear();
+
+                for (Stasiun stat : finalStasiun) {
+                    ArrayList<String> linenNamen = new ArrayList<>();
+
+                    for(Map.Entry<String, Line> entry : lineMap.entrySet()){
+                        for(String line_served : stat.getLine_served()){
+                            Log.d(TAG, "onLineServed loop: " + line_served);
+                            if(entry.getKey().equals(line_served)){
+                                Log.d(TAG, "on lineServed eval: " + line_served);
+                                Line linus = entry.getValue();
+                                if(!linenNamen.contains(linus.getLine_name())){
+                                    Log.d(TAG, "onItemSelected:" + linus.getLine_name());
+                                    linenNamen.add(linus.getLine_name());
+                                }
+                            }
+                        }
+
+                        if(linenNamen.size() == stat.getLine_served().size()){
+                            break;
+                        }
                     }
-                });
+                    Log.d(TAG, "LinenNamen value: " + linenNamen);
+                    StasiunTemp stats = new StasiunTemp(stat.getKode(), stat.getNama(), stat.getLatitude(), stat.getLongitude(), stat.isTransit(), linenNamen);
+                    statTemp.add(stats);
+                }
 
-                String lat1,lng1,lat2,lng2;
-                lat1 = res.getLat1();
-                lng1 = res.getLng1();
-                lat2 = res.getLat2();
-                lng2 = res.getLng2();
+                for (StasiunTemp temp : statTemp) {
+                    LatLng pos = new LatLng(temp.getLat(), temp.getLng());
 
-                LatLng term1 = new LatLng(Double.parseDouble(lat1),Double.parseDouble(lng1));
-                LatLng term2 = new LatLng(Double.parseDouble(lat2),Double.parseDouble(lng2));
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(pos);
 
-                String uri = buildDirectionURL(term1,term2);
+                    Marker m = googleMap.addMarker(markerOptions);
+                    m.setTag(temp);
+                }
+
+                MapInfoWindowAdapter miwa = new MapInfoWindowAdapter(getContext());
+                googleMap.setInfoWindowAdapter(miwa);
+
+                String start_station = line.getStart_station();
+                String end_station = line.getEnd_station();
+
+                ArrayList<LatLng> latlng = new ArrayList<>();
+
+                for(Stasiun stat : stasiunList){
+                    if(latlng.size() < 2){
+                       if(stat.getNama().equals(start_station) || stat.getNama().equals(end_station)){
+                            LatLng pos = new LatLng(stat.getLatitude(),stat.getLongitude());
+                            latlng.add(pos);
+                       }
+                    }
+                }
+
+                LatLng start_pos = latlng.get(0);
+                LatLng end_pos = latlng.get(1);
+
+                String uri = buildDirectionURL(start_pos,end_pos);
+
                 DownloadDirection downloadDirection = new DownloadDirection();
                 downloadDirection.execute(uri);
 
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(term1, 10));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start_pos,10));
             }
 
             @Override
@@ -219,20 +288,89 @@ public class route extends Fragment {
 
             }
         });
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                int white = Color.parseColor("#ffffff");
+//                ((TextView) parent.getChildAt(0)).setTextColor(white);
+//                Result res = result.get(position);
+//
+//                String line_name = res.getLineName();
+//
+//                KeretaAPICall krlapi = new KeretaAPICall();
+//                StasiunInterface stasiunInterface = krlapi.getClient().create(StasiunInterface.class);
+//                Call<Stasiun> calls = stasiunInterface.getStasiun("https://api.clude.xyz/stasiun");
+//                calls.enqueue(new Callback<Stasiun>() {
+//                    @Override
+//                    public void onResponse(Call<Stasiun> call, Response<Stasiun> response) {
+//                        String display_response = "";
+//                        googleMap.clear();
+//                        Stasiun stat = response.body();
+//
+//                        ArrayList<Datum> data = stat.getData();
+//                        for (Datum dat : data) {
+//                            Stasiun_ stasiun_ = dat.getStasiun();
+//                            ArrayList<String> lineArr = dat.getLinenamearr();
+//                            if(lineArr.contains(line_name)){
+//                                stasiunTemps = new ArrayList<>();
+//                                stasiunTemps.clear();
+//                                Boolean isTransit;
+//                                if(stasiun_.getIsTransit() == 0){
+//                                    isTransit = false;
+//                                }else{
+//                                    isTransit = true;
+//                                }
+//                                stasiunTemps.add(new StasiunTemp(stasiun_.getStasiunId(), stasiun_.getNama(),
+//                                        Double.parseDouble(stasiun_.getLat()), Double.parseDouble(stasiun_.getLng()),isTransit, lineArr));
+//
+//                                for(StasiunTemp temp : stasiunTemps){
+//                                    LatLng pos = new LatLng(temp.getLat(), temp.getLng());
+//
+//                                    MarkerOptions markerOptions = new MarkerOptions();
+//                                    markerOptions.position(pos);
+//
+//                                    Marker m = googleMap.addMarker(markerOptions);
+//                                    m.setTag(temp);
+//                                }
+//                                MapInfoWindowAdapter miwa = new MapInfoWindowAdapter(getContext());
+//                                googleMap.setInfoWindowAdapter(miwa);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<Stasiun> call, Throwable t) {
+//                        Log.e("On Stasiun Call", "can't get stasiun, reason:" + t.toString());
+//                        t.printStackTrace();
+//                    }
+//                });
+//
+//                String lat1,lng1,lat2,lng2;
+//                lat1 = res.getLat1();
+//                lng1 = res.getLng1();
+//                lat2 = res.getLat2();
+//                lng2 = res.getLng2();
+//
+//                LatLng term1 = new LatLng(Double.parseDouble(lat1),Double.parseDouble(lng1));
+//                LatLng term2 = new LatLng(Double.parseDouble(lat2),Double.parseDouble(lng2));
+//
+//                String uri = buildDirectionURL(term1,term2);
+//                DownloadDirection downloadDirection = new DownloadDirection();
+//                downloadDirection.execute(uri);
+//
+//                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(term1, 10));
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
 
         ChangeActionBarAndStatusBarColor cbar = new ChangeActionBarAndStatusBarColor(getContext());
         cbar.changeStatusActionBarColorFromFragment(window,abar,R.color.colorPrimary,R.color.colorPrimaryDark);
 
         mMapView = (MapView) view.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-
-        mMapView.onResume(); // needed to get the map to display immediately
-
-        try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -246,6 +384,16 @@ public class route extends Fragment {
 
             }
         });
+
+        mMapView.onCreate(savedInstanceState);
+
+        mMapView.onResume(); // needed to get the map to display immediately
+
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private String buildDirectionURL(LatLng origin, LatLng destination){

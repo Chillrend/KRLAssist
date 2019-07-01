@@ -18,13 +18,15 @@ import com.a4sc11production.krlassist.R;
 import com.a4sc11production.krlassist.adapter.RealtimePositionAdapter;
 import com.a4sc11production.krlassist.adapter.StasiunSpinnerAdapter;
 import com.a4sc11production.krlassist.model.RealtimePos.Data;
-import com.a4sc11production.krlassist.model.RealtimePos.Krl;
 import com.a4sc11production.krlassist.model.RealtimePos.RealtimePos;
 import com.a4sc11production.krlassist.model.RealtimePosition;
 import com.a4sc11production.krlassist.model.Stasiun.Datum;
-import com.a4sc11production.krlassist.model.Stasiun.Stasiun;
 import com.a4sc11production.krlassist.model.Stasiun.Stasiun_;
 import com.a4sc11production.krlassist.model.StasiunSpinner;
+import com.a4sc11production.krlassist.pojo.Krl;
+import com.a4sc11production.krlassist.pojo.Line;
+import com.a4sc11production.krlassist.pojo.Stasiun;
+import com.a4sc11production.krlassist.pojo.Timetable;
 import com.a4sc11production.krlassist.util.APIInterface.PosInterface;
 import com.a4sc11production.krlassist.util.APIInterface.StasiunInterface;
 import com.a4sc11production.krlassist.util.ChangeActionBarAndStatusBarColor;
@@ -68,9 +70,8 @@ public class krl_pos extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private ArrayList<com.a4sc11production.krlassist.pojo.Stasiun> stList, backupStList;
-    private ArrayList<com.a4sc11production.krlassist.pojo.Krl> krlList;
 
-    private Map<String, com.a4sc11production.krlassist.pojo.Krl> krlListing;
+    private Map<String, Line> lineListing;
 
     private String[] testingAutoComplete = {"Bleh", "Blah", "Bloh", "Blih", "Bluh"};
     private AutoCompleteTextView stasiunChooser;
@@ -122,34 +123,23 @@ public class krl_pos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        krlList = new ArrayList<>();
-        krlListing = new HashMap<>();
+        lineListing = new HashMap<>();
 
+        CollectionReference lineRef = db.collection("line");
 
-
-        CollectionReference krlRef = db.collection("krl");
-        krlRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        lineRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()){
-                    ArrayList<String> noKrl = new ArrayList<>();
-                    for(QueryDocumentSnapshot document : task.getResult()){
-                        Map<String, Object> data = document.getData();
-
-                        String line = data.get("line").toString();
-                        Map<String,String> realtime_pos = (HashMap<String, String>) data.get("line-served");
-//                        Map<String,String> realtime_pos = new HashMap<String, String>();
-                        Map<String,Integer> schedule = (HashMap<String,Integer>) data.get("schedule");
-
-                        com.a4sc11production.krlassist.pojo.Krl krlObject = new com.a4sc11production.krlassist.pojo.Krl(line, realtime_pos, schedule);
-
-                        Log.d(TAG, "onComplete: " + document.getId() + " : " + line);
-
-                        krlListing.put(document.getId(), krlObject);
+                    for (QueryDocumentSnapshot document : task.getResult()){
+                        Line line = document.toObject(Line.class);
+                        Log.d(TAG, "onComplete: " + document.getId() + " : " + document.getData().get("line_name"));
+                        lineListing.put(document.getId(), line);
                     }
                 }
             }
         });
+
 
         stList = new ArrayList<>();
         backupStList = new ArrayList<>();
@@ -221,44 +211,108 @@ public class krl_pos extends Fragment {
         return (int) (Math.round(AVERAGE_RADIUS_OF_EARTH * c));
 
     }
-    public void doCallApi(String stasiuns){
-        KeretaAPICall krlapi = new KeretaAPICall();
-        PosInterface realtimeInterface = krlapi.getClient().create(PosInterface.class);
-        Call<RealtimePos> calls = realtimeInterface.getRealtimePosition("https://api.clude.xyz/rpos/stasiun/" + stasiuns);
-        calls.enqueue(new Callback<RealtimePos>() {
+
+    public void doCallApi(String stasiun){
+        CollectionReference krlRef = db.collection("krl");
+        krlRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onResponse(Call<RealtimePos> call, Response<RealtimePos> response) {
-                String display_response = "";
-                try{
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                try {
+
+                    Map<String, Krl> finalKrlMap = new HashMap<>();
+                    Map<String, Krl> krlMap = new HashMap<>();
+
+                    if (task.isSuccessful()) {
+                        ArrayList<String> noKrl = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Map<String, Object> data = document.getData();
+
+                            String line = data.get("line").toString();
+                            Map<String, String> realtime_pos = (HashMap<String, String>) data.get("realtime-pos");
+                            Map<String, Integer> schedule = (HashMap<String, Integer>) data.get("schedule");
+
+                            com.a4sc11production.krlassist.pojo.Krl krlObject = new com.a4sc11production.krlassist.pojo.Krl(line, realtime_pos, schedule);
+
+                            Log.d(TAG, "onComplete: " + document.getId() + " : " + line);
+
+                            krlMap.put(document.getId(), krlObject);
+                        }
+
+                        Map<String, Krl> finalKrl = new HashMap<>();
+
+                        ArrayList<String> line_served = new ArrayList<>();
+
+                        for (Stasiun stat : backupStList) {
+                            if (stat.getNama().equals(stasiun)) {
+                                line_served = new ArrayList<>(stat.getLine_served());
+                                break;
+                            }
+                        }
+
+                        for (int i = 0; i < line_served.size(); i++) {
+                            Line line = lineListing.get(line_served.get(i));
+
+                            ArrayList<String> usedStasiun = new ArrayList<>();
+                            ArrayList<String> loopStation = new ArrayList<>(line.getStasiun_served());
+                            for (int j = 0; j < loopStation.size(); j++) {
+                                if (loopStation.get(j).equals(stasiun)) {
+                                    usedStasiun.add(loopStation.get(j));
+                                    break;
+                                } else {
+                                    usedStasiun.add(loopStation.get(j));
+                                }
+                            }
+
+                            for (int j = 0; j < usedStasiun.size(); j++) {
+                                for (Map.Entry<String, Krl> entry : krlMap.entrySet()) {
+                                    String noKrlLoop = entry.getKey();
+                                    Krl krl = entry.getValue();
+
+                                    Map<String, String> realtime_pos = krl.getRealtime_pos();
+
+                                    if (realtime_pos.get("stasiun").equals(usedStasiun.get(j)) && krl.getLine().equals(line_served.get(i))) {
+                                        Log.d(TAG, "onIteration usedStation: " + usedStasiun);
+                                        Log.d(TAG, "matching Stasiun : " + usedStasiun.get(j) + ", KA " + noKrlLoop + ", Status " + realtime_pos.get("status") + " " + realtime_pos.get("stasiun"));
+                                        finalKrlMap.put(noKrlLoop, krl);
+                                    }
+                                }
+                            }
+                        }
+
+                        ArrayList<RealtimePosition> realtimePosList = new ArrayList<>();
+
+                        for (Map.Entry<String, Krl> krlEntry : finalKrlMap.entrySet()) {
+                            Krl krl = krlEntry.getValue();
+
+                            String relasi = krl.getLine();
+                            String noKa = krlEntry.getKey();
+
+                            jadwal jdwl = new jadwal();
+
+                            String determinedLine = jdwl.determineLine(relasi);
+
+                            Map<String, String> realtime_pos = krl.getRealtime_pos();
+
+                            String status = realtime_pos.get("status");
+                            String stamformasi = realtime_pos.get("sf");
+                            String status_stasion = realtime_pos.get("stasiun");
+
+                            RealtimePosition rPos = new RealtimePosition(noKa, relasi, status, status_stasion, determinedLine, Integer.parseInt(stamformasi));
+                            realtimePosList.add(rPos);
+                        }
 
 
-                    RealtimePos rpos = response.body();
-
-                    Data data = rpos.getData();
-
-                    ArrayList<Krl> krlList = new ArrayList<>();
-
-                    krlList.clear();
-
-                    krlList = data.getKrl();
-
-                    krlList = data.getKrl();
-
-                    realtimeAdapter = new RealtimePositionAdapter(krlList, getContext());
-
-                    realtime_pos_listview.setAdapter(realtimeAdapter);
-                }catch (Exception E){
-                    Log.e("On rPos Call", "can't get realtime position, reason:" + E.toString());
-                    E.printStackTrace();
+                        RealtimePositionAdapter rPosAdapter = new RealtimePositionAdapter(realtimePosList, getContext());
+                        rPosAdapter.notifyDataSetChanged();
+                        realtime_pos_listview.setAdapter(rPosAdapter);
+                    }
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                    Toasty.error(getContext(), "Tidak menemukan KRL menuju " + stasiun).show();
                 }
             }
+            });
 
-            @Override
-            public void onFailure(Call<RealtimePos> call, Throwable t) {
-                Log.e("On rPos Call", "can't get realtime position, reason:" + t.toString());
-                t.printStackTrace();
-            }
-        });
     }
 
 
@@ -277,61 +331,12 @@ public class krl_pos extends Fragment {
         stasiunChooser.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Stasiun_ stasiunSpinner = (Stasiun_) parent.getItemAtPosition(position);
-                String stasiun_id = stasiunSpinner.getStasiunId();
+                Stasiun stasiunSpinner = (Stasiun) parent.getItemAtPosition(position);
+                String stasiun_id = stasiunSpinner.getNama();
 
-                KeretaAPICall krlapi = new KeretaAPICall();
-                PosInterface realtimeInterface = krlapi.getClient().create(PosInterface.class);
-                Call<RealtimePos> calls = realtimeInterface.getRealtimePosition("https://api.clude.xyz/rpos/stasiun/" + stasiun_id);
-                calls.enqueue(new Callback<RealtimePos>() {
-                    @Override
-                    public void onResponse(Call<RealtimePos> call, Response<RealtimePos> response) {
-                        String display_response = "";
-                        try{
-
-
-                            RealtimePos rpos = response.body();
-
-                            Data data = rpos.getData();
-
-                            ArrayList<Krl> krlList = new ArrayList<>();
-
-                            krlList.clear();
-
-                            krlList = data.getKrl();
-
-                            krlList = data.getKrl();
-
-                            realtimeAdapter = new RealtimePositionAdapter(krlList, getContext());
-
-                            realtime_pos_listview.setAdapter(realtimeAdapter);
-                        }catch (Exception E){
-                            Log.e("On rPos Call", "can't get realtime position, reason:" + E.toString());
-                            E.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<RealtimePos> call, Throwable t) {
-                        Log.e("On rPos Call", "can't get realtime position, reason:" + t.toString());
-                        t.printStackTrace();
-                    }
-                });
+                doCallApi(stasiun_id);
             }
         });
-
-
-
-        realtimeList = new ArrayList<>();
-        realtimeList.add(new RealtimePosition("D1/1270", "Nambo - Angke", "Berangkat Cibinong", "Loop Line", 8));
-        realtimeList.add(new RealtimePosition("1571", "Bogor - Jakarta Kota", "Di Citayam", "Central Line", 12));
-        realtimeList.add(new RealtimePosition("1080-1081", "Bogor - Jatinegara", "Di Bojong Gede", "Loop Line", 8));
-        realtimeList.add(new RealtimePosition("1921", "Bogor - Angke", "Berangkat Bogor", "Loop Line", 10));
-        realtimeList.add(new RealtimePosition("D1/1511", "Angke - Nambo", "Di Pondok Cina", "Loop Line", 10));
-        realtimeList.add(new RealtimePosition("1611", "Jakarta Kota - Bogor", "Berangkat Univ. Indonesia", "Central Line", 12));
-        realtimeList.add(new RealtimePosition("1271", "Jakarta Kota - Bogor", "Berangkat Lenteng Agung", "Central Line", 8));
-
-
     }
 
 

@@ -1,0 +1,233 @@
+[33mcommit 13c23e99c15949f904aaf0f3515787fd458f2099[m[33m ([m[1;36mHEAD -> [m[1;32mfirestore_enabled[m[33m, [m[1;31morigin/firestore_enabled[m[33m)[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Sun Jun 30 11:52:17 2019 +0700
+
+    Timetable and Tariffs are now done, in-progress Realtime Position
+
+[33mcommit 7b405d92332691cc47398fabed1bcdcecdb8aab6[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Jun 26 20:58:26 2019 +0700
+
+    Migrated to firestore 2 modules (Home and GangguanList), on-going changing StasiunList Adapter
+
+[33mcommit bd6a0af53ba5530046cee46647aa486cae859154[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Mon Jun 24 20:02:36 2019 +0700
+
+    initial database migration setup
+
+[33mcommit 6bbe24f2b93867abd684f50cde423c31db68740c[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Sun Mar 31 10:37:28 2019 +0700
+
+    Final Push (ithink?). Fixed orientation problem, and added about page.
+
+[33mcommit 60945208a68e1aef869021d3d8a86ef3bc57a3e2[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Thu Mar 28 17:45:53 2019 +0700
+
+    Fixed KRL Position to use current device location as default stasiun choosed
+
+[33mcommit dcf4b51d7a341d2a88accfb1c35e395212301a70[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 27 22:07:52 2019 +0700
+
+    Tx History Done.
+
+[33mcommit 378838bbd7d207d0c666175fa36a4ddf6a4d1011[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 27 20:59:36 2019 +0700
+
+    Route Done.
+
+[33mcommit 1cf1db84bebfcff0c052facaa8b50cee00cfc6d6[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 27 18:35:28 2019 +0700
+
+    Timetable done-
+
+[33mcommit 8d55df630d95df961130822253ea7902cf579f34[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 27 12:30:11 2019 +0700
+
+    Gangguan for homepage and info lanjut is done.
+
+[33mcommit 93dec4d7bc8238438faa926f670bf66fb94aee9c[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 27 09:15:35 2019 +0700
+
+    Minor UI Fixes, and Transaction History adapter created
+
+[33mcommit 7962bc07beb2b9bd295b1390394b081032ab5271[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Tue Mar 26 20:56:29 2019 +0700
+
+    Minor UI Fixes, and Transaction History adapter created
+
+[33mcommit 44cd12957b425a84a5b6b581f786ad465e6dcde3[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Tue Mar 26 16:36:40 2019 +0700
+
+    Realtime Position is now Done, enjoy.
+
+[33mcommit b5e82173e13a7689e922eb2062c0acbf94d247e5[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Mon Mar 25 22:34:32 2019 +0700
+
+    Added Custom Dialog, and smoothen up NFC View
+
+[33mcommit ec06283943db98db18720dcd0b32449d3823f73d[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Sun Mar 24 22:59:05 2019 +0700
+
+    Added Google Maps, and marker info window
+
+[33mcommit f5b4fe12c779c9cb6596e755e72b0d09c3a32d28[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Sun Mar 24 22:58:22 2019 +0700
+
+    Added Google Maps, and marker info window
+
+[33mcommit 3eefa175fb3d57cd5d83471070d22e93c707b462[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Fri Mar 22 22:17:56 2019 +0700
+
+    Added NFC Balance Reading Capability
+
+[33mcommit 084f0f73f3e815948f5b561003133a3e460d3e71[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Fri Mar 22 16:17:17 2019 +0700
+
+    Added onTimeSetListener to TImePicker at Jadwal Fragment
+
+[33mcommit 98702c8c4eba438a3ac78784651a033026d2cb20[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Thu Mar 21 16:03:37 2019 +0700
+
+    Some UI Fixes and added Line Status
+
+[33mcommit 5f99c574996e53eeb0dfdae76edeab1a4cb2f8f7[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Thu Mar 21 09:40:27 2019 +0700
+
+    Added implementation of getting device location, updated weather widget to use device location
+
+[33mcommit 0fde9ab9f4e25b446afc816608a76d646509e7d7[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Wed Mar 20 07:42:11 2019 +0700
+
+    inprogress timetable fragments
+
+[33mcommit 79e7dce559b44498397dbe93dfa8acf5ef03aa8a[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Tue Mar 19 21:08:21 2019 +0700
+
+    Weather feature in Drawer Header is now working, implemented retrofit for REST client
+
+[33mcommit d0192424ea1cfb9814be97b13aed2f7b238f7e60[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Tue Mar 19 20:01:39 2019 +0700
+
+    Inprogress Retrofit implementation
+
+[33mcommit d12d7595ff72ecfe585259796e9621943c2031b0[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Mon Mar 18 21:54:33 2019 +0700
+
+    Implemented Realtime ListView with custom adapter
+
+[33mcommit 56441027569b40adef4271f4e2a933919a6ec35d[m
+Author: Farhan Hanif <madjavacoder@gmail.com>
+Date:   Mon Mar 18 20:09:43 2019 +0700
+
+    Fixed Another Typo
+
+[33mcommit 2e6d44fc1bd836e9d9d3da17d7a4c37bbc11dfbb[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Mon Mar 18 20:04:35 2019 +0700
+
+    Fixed Typo
+
+[33mcommit aa7c918b86f588a718c9a29be7eda6ce7bd8e1a3[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Mon Mar 18 20:01:42 2019 +0700
+
+    Updated README.MD
+
+[33mcommit 4df3e8b9960fd6b9dfddd67b493c8d0e9880937e[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Mon Mar 18 19:51:34 2019 +0700
+
+    Reconstructed layout directory folder and drawable naming convention for cleaner project
+
+[33mcommit 1e2a56343b74e55b63284e202d779f93c6cb5789[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Sun Mar 17 22:56:51 2019 +0700
+
+    Added inprogress Realtime KRL Position with Custom AutoTextView adapter
+
+[33mcommit 13280860e612e34b8426abd427341cabb9fc3d79[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Sun Mar 17 18:30:07 2019 +0700
+
+    Added NFC KMT Scan Activity with Working NFC Tag Reading Capability
+
+[33mcommit 241cde9d48dbba134fb143d62f794b515e8f5fd1[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Sat Mar 16 21:15:09 2019 +0700
+
+    Implemented Navigation Drawer and Setting default home fragment
+
+[33mcommit bb2e64b3431abc5723e39ace711328dd4fd0cdb1[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Sat Mar 16 13:22:42 2019 +0700
+
+    Added HomeActivity layout
+
+[33mcommit db78916036441ecbdbee7c3099aaec4d015fb266[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Wed Mar 13 23:15:02 2019 +0700
+
+    Added Main Activity and Translucent Status Bar
+
+[33mcommit a71b74ac13c463a4d67f058d1ca2db30e4a99f10[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Wed Mar 13 23:09:50 2019 +0700
+
+    Added app walkthrough (Onboarding Activity)
+
+[33mcommit a556773cf6ebc9948e3fcf3fce9927e087002ae0[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Wed Mar 13 17:56:14 2019 +0700
+
+    Added app walkthrough (Onboarding Activity)
+
+[33mcommit 0845f35e8ca15de99faa5aefb1ddd7db16fb29af[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Wed Feb 27 21:17:41 2019 +0700
+
+    Added app walkthrough (Onboarding Activity) (In-Progress)
+
+[33mcommit 14a455e4405793c7cbb4e0aa934b3d501f83a0d9[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Wed Feb 27 20:09:48 2019 +0700
+
+    Added app walkthrough (Onboarding Activity) (In-Progress)
+
+[33mcommit 1b3812a42de3ceae1eda5765a1d49f08d98ed9a6[m
+Author: Farhan Hanif <38966867+Chillrend@users.noreply.github.com>
+Date:   Tue Feb 26 21:04:23 2019 +0700
+
+    Create readme.md
+
+[33mcommit 3cfdb3da98aff36bbcc933acabb6dc6b7a248eb8[m
+Author: Farhan Hanif <38966867+Chillrend@users.noreply.github.com>
+Date:   Tue Feb 26 21:03:51 2019 +0700
+
+    Create LICENSE
+
+[33mcommit 7da9d36c87d0e9c7066cb4ff34c3e810e3ec0b4b[m
+Author: Farhan Hanif <cv2lex@gmail.com>
+Date:   Tue Feb 26 20:59:40 2019 +0700
+
+    Initial Commit

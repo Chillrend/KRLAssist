@@ -4,13 +4,15 @@ public class RealtimePosition {
     private String nomor_ka;
     private String relasi;
     private String realtime_status;
+    private String stasiun_at;
     private String line;
     private int stamformasi;
 
-    public RealtimePosition(String nomor_ka, String relasi, String realtime_status, String line, int stamformasi) {
+    public RealtimePosition(String nomor_ka, String relasi, String realtime_status,String stasiun_at, String line, int stamformasi) {
         this.nomor_ka = nomor_ka;
         this.relasi = relasi;
         this.realtime_status = realtime_status;
+        this.stasiun_at = stasiun_at;
         this.line = line;
         this.stamformasi = stamformasi;
     }
@@ -37,6 +39,14 @@ public class RealtimePosition {
 
     public void setRealtime_status(String realtime_status) {
         this.realtime_status = realtime_status;
+    }
+
+    public String getStasiun_at() {
+        return stasiun_at;
+    }
+
+    public void setStasiun_at(String stasiun_at) {
+        this.stasiun_at = stasiun_at;
     }
 
     public String getLine() {

@@ -31,7 +31,6 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         View view = ((Activity)ctx).getLayoutInflater()
                 .inflate(R.layout.map_info_window, null);
 
-
         st_name = view.findViewById(R.id.map_stasiun_name);
         st_id = view.findViewById(R.id.map_kode_stasiun);
         isTransit = view.findViewById(R.id.isTransit);
@@ -90,18 +89,20 @@ public class MapInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     }
 
     private int getDrawable(String line){
-        if(line.equals("Central Line")){
-            return R.drawable.ic_red_line_18dp;
-        }else if(line.equals("Loop Line")){
-            return R.drawable.ic_loop_line_18dp;
-        }else if(line.equals("Rangkasbitung Line")){
-            return R.drawable.ic_rangkasbitung_line_18dp;
-        }else if(line.equals("Bekasi Line")){
-            return R.drawable.ic_bekasi_line;
-        }else if(line.equals("Tangerang Line")){
-            return R.drawable.ic_tangerang_line_18dp;
-        }else if(line.equals("Tanjung Priok Line")){
-            return R.drawable.ic_tanjung_priok_18dp;
+
+        switch (line) {
+            case "Central Line":
+                return R.drawable.ic_red_line_18dp;
+            case "Loop Line":
+                return R.drawable.ic_loop_line_18dp;
+            case "Rangkasbitung Line":
+                return R.drawable.ic_rangkasbitung_line_18dp;
+            case "Bekasi Line":
+                return R.drawable.ic_bekasi_line;
+            case "Tangerang Line":
+                return R.drawable.ic_tangerang_line_18dp;
+            case "Tanjung Priok Line":
+                return R.drawable.ic_tanjung_priok_18dp;
         }
         return R.drawable.ic_forbidden;
     }

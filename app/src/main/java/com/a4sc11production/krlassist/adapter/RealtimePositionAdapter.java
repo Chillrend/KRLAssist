@@ -14,9 +14,9 @@ import com.a4sc11production.krlassist.model.RealtimePosition;
 
 import java.util.ArrayList;
 
-public class RealtimePositionAdapter extends ArrayAdapter<Krl> {
+public class RealtimePositionAdapter extends ArrayAdapter<RealtimePosition> {
 
-    private ArrayList<Krl> items;
+    private ArrayList<RealtimePosition> items;
     Context ctx;
 
     private static class ViewHolder {
@@ -27,7 +27,7 @@ public class RealtimePositionAdapter extends ArrayAdapter<Krl> {
         RelativeLayout parent_container;
     }
 
-    public RealtimePositionAdapter(ArrayList<Krl> data,  Context mCtx){
+    public RealtimePositionAdapter(ArrayList<RealtimePosition> data,  Context mCtx){
         super(mCtx, R.layout.realtime_list_item, data);
 
         this.items = data;
@@ -36,7 +36,7 @@ public class RealtimePositionAdapter extends ArrayAdapter<Krl> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        Krl rPos = getItem(position);
+        RealtimePosition rPos = getItem(position);
 
         ViewHolder viewHolder;
 
@@ -60,12 +60,12 @@ public class RealtimePositionAdapter extends ArrayAdapter<Krl> {
             result = convertView;
         }
 
-        viewHolder.nomor_ka.setText(rPos.getTrainNo());
+        viewHolder.nomor_ka.setText(rPos.getNomor_ka());
         viewHolder.relasi.setText(rPos.getRelasi());
-        viewHolder.realtime_status.setText(rPos.getSetatus());
+        viewHolder.realtime_status.setText(rPos.getRealtime_status() + " " + rPos.getStasiun_at());
         viewHolder.stamformasi.setText(String.valueOf(rPos.getStamformasi()));
 
-        String line = rPos.getLineName();
+        String line = rPos.getLine();
         if(line.equals("Central Line")){
             viewHolder.parent_container.setBackgroundColor(ctx.getResources().getColor(R.color.RedLine));
         }else if(line.equals("Loop Line")){
